@@ -1,4 +1,4 @@
-#include "ThirdPersonSampleCharacter.h"
+#include "PlayerCharacter.h"
 
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -11,7 +11,7 @@
 #include "InputActionValue.h"
 #include "UObject/ConstructorHelpers.h"
 
-AThirdPersonSampleCharacter::AThirdPersonSampleCharacter()
+APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -84,7 +84,7 @@ AThirdPersonSampleCharacter::AThirdPersonSampleCharacter()
 	}
 }
 
-void AThirdPersonSampleCharacter::BeginPlay()
+void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -92,15 +92,15 @@ void AThirdPersonSampleCharacter::BeginPlay()
 	RefreshCameraZoomBounds();
 }
 
-void AThirdPersonSampleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AThirdPersonSampleCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AThirdPersonSampleCharacter::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AThirdPersonSampleCharacter::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AThirdPersonSampleCharacter::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &AThirdPersonSampleCharacter::ZoomCamera);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &APlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &APlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APlayerCharacter::Turn);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APlayerCharacter::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &APlayerCharacter::ZoomCamera);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
 
@@ -118,21 +118,21 @@ void AThirdPersonSampleCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 	if (MoveAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AThirdPersonSampleCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 	}
 
 	if (LookAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AThirdPersonSampleCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 	}
 
 	if (MouseLookAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AThirdPersonSampleCharacter::Look);
+		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 	}
 }
 
-void AThirdPersonSampleCharacter::Tick(float DeltaSeconds)
+void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -152,7 +152,7 @@ void AThirdPersonSampleCharacter::Tick(float DeltaSeconds)
 	CameraBoom->TargetArmLength = FMath::Clamp(NewArmLength, MinCameraBoomLength, MaxCameraBoomLength);
 }
 
-void AThirdPersonSampleCharacter::MoveForward(float Value)
+void APlayerCharacter::MoveForward(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || Controller == nullptr)
 	{
@@ -165,7 +165,7 @@ void AThirdPersonSampleCharacter::MoveForward(float Value)
 	AddMovementInput(ForwardDirection, Value);
 }
 
-void AThirdPersonSampleCharacter::MoveRight(float Value)
+void APlayerCharacter::MoveRight(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || Controller == nullptr)
 	{
@@ -178,7 +178,7 @@ void AThirdPersonSampleCharacter::MoveRight(float Value)
 	AddMovementInput(RightDirection, Value);
 }
 
-void AThirdPersonSampleCharacter::Turn(float Value)
+void APlayerCharacter::Turn(float Value)
 {
 	if (!FMath::IsNearlyZero(Value))
 	{
@@ -186,7 +186,7 @@ void AThirdPersonSampleCharacter::Turn(float Value)
 	}
 }
 
-void AThirdPersonSampleCharacter::LookUp(float Value)
+void APlayerCharacter::LookUp(float Value)
 {
 	if (!FMath::IsNearlyZero(Value))
 	{
@@ -194,7 +194,7 @@ void AThirdPersonSampleCharacter::LookUp(float Value)
 	}
 }
 
-void AThirdPersonSampleCharacter::ZoomCamera(float Value)
+void APlayerCharacter::ZoomCamera(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || CameraBoom == nullptr)
 	{
@@ -208,21 +208,21 @@ void AThirdPersonSampleCharacter::ZoomCamera(float Value)
 		MaxCameraBoomLength);
 }
 
-void AThirdPersonSampleCharacter::Move(const FInputActionValue& Value)
+void APlayerCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	MoveForward(MovementVector.Y);
 	MoveRight(MovementVector.X);
 }
 
-void AThirdPersonSampleCharacter::Look(const FInputActionValue& Value)
+void APlayerCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	Turn(LookAxisVector.X);
 	LookUp(LookAxisVector.Y);
 }
 
-void AThirdPersonSampleCharacter::RefreshCameraZoomBounds()
+void APlayerCharacter::RefreshCameraZoomBounds()
 {
 	if (CameraBoom == nullptr)
 	{

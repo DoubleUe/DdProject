@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "ThirdPersonSampleCharacter.generated.h"
+#include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
 class UInputAction;
@@ -10,12 +10,12 @@ class USpringArmComponent;
 struct FInputActionValue;
 
 UCLASS()
-class TESTPROJECT_API AThirdPersonSampleCharacter : public ACharacter
+class TESTPROJECT_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AThirdPersonSampleCharacter();
+	APlayerCharacter();
 
 protected:
 	virtual void BeginPlay() override;
