@@ -3,51 +3,51 @@ import unreal
 PAIRS = [
     (
         "/Game/Mannequin/Animations/ThirdPersonIdle",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonIdle",
+        "/Game/Characters/Player/Animations/ThirdPersonIdle",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_End",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_End",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_End",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_Loop",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Loop",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_Loop",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_Start",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Start",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_Start",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonRun",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonRun",
+        "/Game/Characters/Player/Animations/ThirdPersonRun",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonWalk",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonWalk",
+        "/Game/Characters/Player/Animations/ThirdPersonWalk",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPerson_IdleRun_2D",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPerson_IdleRun_2D",
+        "/Game/Characters/Player/Animations/ThirdPerson_IdleRun_2D",
     ),
     (
         "/Game/Mannequin/Character/Materials/MaterialLayers/T_ML_Aluminum01",
-        "/Game/Characters/ThirdPerson/Character/Materials/MaterialLayers/T_ML_Aluminum01",
+        "/Game/Characters/Player/Character/Materials/MaterialLayers/T_ML_Aluminum01",
     ),
     (
         "/Game/Mannequin/Character/Materials/MaterialLayers/T_ML_Aluminum01_N",
-        "/Game/Characters/ThirdPerson/Character/Materials/MaterialLayers/T_ML_Aluminum01_N",
+        "/Game/Characters/Player/Character/Materials/MaterialLayers/T_ML_Aluminum01_N",
     ),
     (
         "/Game/Mannequin/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_D",
-        "/Game/Characters/ThirdPerson/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_D",
+        "/Game/Characters/Player/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_D",
     ),
     (
         "/Game/Mannequin/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_N",
-        "/Game/Characters/ThirdPerson/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_N",
+        "/Game/Characters/Player/Character/Materials/MaterialLayers/T_ML_Rubber_Blue_01_N",
     ),
     (
         "/Game/Mannequin/Character/Mesh/SK_Mannequin_Skeleton",
-        "/Game/Characters/ThirdPerson/Character/Mesh/SK_Mannequin_Skeleton",
+        "/Game/Characters/Player/Character/Mesh/SK_Mannequin_Skeleton",
     ),
 ]
 

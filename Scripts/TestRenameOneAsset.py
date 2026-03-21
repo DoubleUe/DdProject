@@ -1,7 +1,7 @@
 import unreal
 
 SOURCE = "/Game/Mannequin/Character/Textures/T_UE4_Mannequin_Mobile_M"
-TARGET = "/Game/Characters/ThirdPerson/Character/Textures/T_UE4_Mannequin_Mobile_M"
+TARGET = "/Game/Characters/Player/Character/Textures/T_UE4_Mannequin_Mobile_M"
 
 
 def log_state(label):

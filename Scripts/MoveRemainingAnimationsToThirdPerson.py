@@ -3,35 +3,35 @@ import unreal
 PAIRS = [
     (
         "/Game/Mannequin/Animations/ThirdPersonIdle",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonIdle",
+        "/Game/Characters/Player/Animations/ThirdPersonIdle",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonRun",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonRun",
+        "/Game/Characters/Player/Animations/ThirdPersonRun",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonWalk",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonWalk",
+        "/Game/Characters/Player/Animations/ThirdPersonWalk",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_Start",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Start",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_Start",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_Loop",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Loop",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_Loop",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPersonJump_End",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_End",
+        "/Game/Characters/Player/Animations/ThirdPersonJump_End",
     ),
     (
         "/Game/Mannequin/Animations/ThirdPerson_IdleRun_2D",
-        "/Game/Characters/ThirdPerson/Animations/ThirdPerson_IdleRun_2D",
+        "/Game/Characters/Player/Animations/ThirdPerson_IdleRun_2D",
     ),
 ]
 
-ANIM_BP_PATH = "/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP"
+ANIM_BP_PATH = "/Game/Characters/Player/Animations/ThirdPerson_AnimBP"
 
 
 def rename_asset(source_path, target_path):

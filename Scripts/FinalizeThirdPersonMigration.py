@@ -1,6 +1,6 @@
 import unreal
 
-TARGET_ANIM_BP = "/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP"
+TARGET_ANIM_BP = "/Game/Characters/Player/Animations/ThirdPerson_AnimBP"
 SOURCE_ANIM_BP = "/Game/Mannequin/Animations/ThirdPerson_AnimBP"
 
 

@@ -1,16 +1,16 @@
 import unreal
 
-TARGET_SKELETON_PATH = "/Game/Characters/ThirdPerson/Character/Mesh/SK_Mannequin_Skeleton"
+TARGET_SKELETON_PATH = "/Game/Characters/Player/Character/Mesh/SK_Mannequin_Skeleton"
 ANIMATION_ASSET_PATHS = [
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonIdle",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonRun",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonWalk",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Start",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_Loop",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonJump_End",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPerson_IdleRun_2D",
+    "/Game/Characters/Player/Animations/ThirdPersonIdle",
+    "/Game/Characters/Player/Animations/ThirdPersonRun",
+    "/Game/Characters/Player/Animations/ThirdPersonWalk",
+    "/Game/Characters/Player/Animations/ThirdPersonJump_Start",
+    "/Game/Characters/Player/Animations/ThirdPersonJump_Loop",
+    "/Game/Characters/Player/Animations/ThirdPersonJump_End",
+    "/Game/Characters/Player/Animations/ThirdPerson_IdleRun_2D",
 ]
-ANIM_BP_PATH = "/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP"
+ANIM_BP_PATH = "/Game/Characters/Player/Animations/ThirdPerson_AnimBP"
 
 
 def load_required_asset(asset_path):

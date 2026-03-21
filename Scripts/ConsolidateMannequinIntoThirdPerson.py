@@ -1,7 +1,7 @@
 import unreal
 
 SOURCE_ROOT = "/Game/Mannequin"
-TARGET_ROOT = "/Game/Characters/ThirdPerson"
+TARGET_ROOT = "/Game/Characters/Player"
 TARGET_ANIM_BP = f"{TARGET_ROOT}/Animations/ThirdPerson_AnimBP"
 SOURCE_ANIM_BP = f"{SOURCE_ROOT}/Animations/ThirdPerson_AnimBP"
 
