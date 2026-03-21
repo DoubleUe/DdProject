@@ -1,9 +1,9 @@
 import unreal
 
 PATHS = [
-    "/Game/Characters/ThirdPerson/Character/Textures/T_UE4_Mannequin_Mobile_M",
-    "/Game/Characters/ThirdPerson/Character/Mesh/SK_Mannequin",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP",
+    "/Game/Characters/Player/Character/Textures/T_UE4_Mannequin_Mobile_M",
+    "/Game/Characters/Player/Character/Mesh/SK_Mannequin",
+    "/Game/Characters/Player/Animations/ThirdPerson_AnimBP",
     "/Game/Mannequin/Character/Textures/T_UE4_Mannequin_Mobile_M",
 ]
 

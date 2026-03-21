@@ -46,38 +46,38 @@ APlayerCharacter::APlayerCharacter()
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("/Game/Characters/ThirdPerson/Character/Mesh/SK_Mannequin.SK_Mannequin"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshAsset(TEXT("/Game/Characters/Player/Character/Mesh/SK_Mannequin.SK_Mannequin"));
 	if (MeshAsset.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MeshAsset.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprintClass(TEXT("/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprintClass(TEXT("/Game/Characters/Player/Animations/ThirdPerson_AnimBP"));
 	if (AnimBlueprintClass.Class != nullptr)
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		GetMesh()->SetAnimInstanceClass(AnimBlueprintClass.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Characters/ThirdPerson/Input/Actions/IA_Jump.IA_Jump"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Jump.IA_Jump"));
 	if (JumpActionAsset.Succeeded())
 	{
 		JumpAction = JumpActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Characters/ThirdPerson/Input/Actions/IA_Move.IA_Move"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Move.IA_Move"));
 	if (MoveActionAsset.Succeeded())
 	{
 		MoveAction = MoveActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Characters/ThirdPerson/Input/Actions/IA_Look.IA_Look"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Look.IA_Look"));
 	if (LookActionAsset.Succeeded())
 	{
 		LookAction = LookActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLookActionAsset(TEXT("/Game/Characters/ThirdPerson/Input/Actions/IA_MouseLook.IA_MouseLook"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLookActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_MouseLook.IA_MouseLook"));
 	if (MouseLookActionAsset.Succeeded())
 	{
 		MouseLookAction = MouseLookActionAsset.Object;

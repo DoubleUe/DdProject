@@ -1,9 +1,9 @@
 import unreal
 
 ASSET_PATHS = [
-    "/Game/Characters/ThirdPerson/Animations/ThirdPersonIdle",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPerson_IdleRun_2D",
-    "/Game/Characters/ThirdPerson/Animations/ThirdPerson_AnimBP",
+    "/Game/Characters/Player/Animations/ThirdPersonIdle",
+    "/Game/Characters/Player/Animations/ThirdPerson_IdleRun_2D",
+    "/Game/Characters/Player/Animations/ThirdPerson_AnimBP",
 ]
 
 PROPERTY_NAMES = [
