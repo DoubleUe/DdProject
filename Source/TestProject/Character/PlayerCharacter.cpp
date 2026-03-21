@@ -89,7 +89,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	DesiredCameraBoomLength = CameraBoom != nullptr ? CameraBoom->TargetArmLength : DesiredCameraBoomLength;
-	RefreshCameraZoomBounds();
+	bCameraZoomBoundsDirty = true;
+	UpdateCameraZoom(0.0f);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -136,20 +137,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (CameraBoom == nullptr)
-	{
-		return;
-	}
-
-	RefreshCameraZoomBounds();
-
-	const float NewArmLength = FMath::FInterpTo(
-		CameraBoom->TargetArmLength,
-		DesiredCameraBoomLength,
-		DeltaSeconds,
-		CameraZoomInterpSpeed);
-
-	CameraBoom->TargetArmLength = FMath::Clamp(NewArmLength, MinCameraBoomLength, MaxCameraBoomLength);
+	UpdateCameraZoom(DeltaSeconds);
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -201,11 +189,8 @@ void APlayerCharacter::ZoomCamera(float Value)
 		return;
 	}
 
-	RefreshCameraZoomBounds();
-	DesiredCameraBoomLength = FMath::Clamp(
-		DesiredCameraBoomLength - (Value * CameraZoomStep),
-		MinCameraBoomLength,
-		MaxCameraBoomLength);
+	DesiredCameraBoomLength -= Value * CameraZoomStep;
+	bCameraZoomBoundsDirty = true;
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
@@ -222,6 +207,42 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	LookUp(LookAxisVector.Y);
 }
 
+void APlayerCharacter::UpdateCameraZoom(float DeltaSeconds)
+{
+	if (CameraBoom == nullptr)
+	{
+		return;
+	}
+
+	const float CapsuleZoomLimit = FMath::Max(0.0f, GetCapsuleComponent()->GetScaledCapsuleRadius() * 4.0f);
+	if (!FMath::IsNearlyEqual(CachedCapsuleZoomLimit, CapsuleZoomLimit))
+	{
+		CachedCapsuleZoomLimit = CapsuleZoomLimit;
+		bCameraZoomBoundsDirty = true;
+	}
+
+	if (bCameraZoomBoundsDirty)
+	{
+		RefreshCameraZoomBounds();
+		bCameraZoomBoundsDirty = false;
+	}
+
+	if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, DesiredCameraBoomLength))
+	{
+		return;
+	}
+
+	const float NewArmLength = FMath::FInterpTo(
+		CameraBoom->TargetArmLength,
+		DesiredCameraBoomLength,
+		DeltaSeconds,
+		CameraZoomInterpSpeed);
+
+	CameraBoom->TargetArmLength = FMath::IsNearlyEqual(NewArmLength, DesiredCameraBoomLength)
+		? DesiredCameraBoomLength
+		: NewArmLength;
+}
+
 void APlayerCharacter::RefreshCameraZoomBounds()
 {
 	if (CameraBoom == nullptr)
@@ -229,7 +250,9 @@ void APlayerCharacter::RefreshCameraZoomBounds()
 		return;
 	}
 
-	const float CapsuleZoomLimit = GetCapsuleComponent()->GetScaledCapsuleRadius() * 4.0f;
+	const float CapsuleZoomLimit = CachedCapsuleZoomLimit >= 0.0f
+		? CachedCapsuleZoomLimit
+		: FMath::Max(0.0f, GetCapsuleComponent()->GetScaledCapsuleRadius() * 4.0f);
 	MinCameraBoomLength = FMath::Max(0.0f, CapsuleZoomLimit);
 	MaxCameraBoomLength = FMath::Max(MinCameraBoomLength, MaxCameraBoomLength);
 	DesiredCameraBoomLength = FMath::Clamp(DesiredCameraBoomLength, MinCameraBoomLength, MaxCameraBoomLength);

@@ -30,6 +30,7 @@ private:
 	void ZoomCamera(float Value);
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void UpdateCameraZoom(float DeltaSeconds);
 	void RefreshCameraZoomBounds();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
@@ -52,6 +53,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
 	float DesiredCameraBoomLength = 0.0f;
+
+	UPROPERTY()
+	bool bCameraZoomBoundsDirty = true;
+
+	UPROPERTY()
+	float CachedCapsuleZoomLimit = -1.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInputAction> JumpAction;
