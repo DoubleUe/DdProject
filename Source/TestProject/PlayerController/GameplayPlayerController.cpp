@@ -4,7 +4,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
+#include "InputCoreTypes.h"
 #include "UObject/ConstructorHelpers.h"
+#include "../UI/Gameplay/ResultPopupSettings.h"
+#include "../UI/Gameplay/ResultPopupWidget.h"
 #include "../UI/Title/ScreenFadeWidget.h"
 #include "../UI/Title/TitleScreenSettings.h"
 
@@ -28,6 +31,7 @@ void AGameplayPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	EnsureScreenFadeWidget();
+	EnsureResultPopupWidget();
 
 	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
 	if (ScreenFadeWidget != nullptr && Settings != nullptr)
@@ -36,6 +40,16 @@ void AGameplayPlayerController::BeginPlay()
 	}
 
 	ConfigureGameplayInput();
+}
+
+void AGameplayPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (InputComponent != nullptr)
+	{
+		InputComponent->BindKey(EKeys::LeftBracket, IE_Pressed, this, &AGameplayPlayerController::ToggleResultPopup);
+	}
 }
 
 void AGameplayPlayerController::ConfigureGameplayInput()
@@ -108,4 +122,73 @@ void AGameplayPlayerController::EnsureScreenFadeWidget()
 		ScreenFadeWidget->AddToViewport(1000);
 		ScreenFadeWidget->SetFadeAlpha(1.0f);
 	}
+}
+
+void AGameplayPlayerController::EnsureResultPopupWidget()
+{
+	if (ResultPopupWidget != nullptr)
+	{
+		return;
+	}
+
+	const UResultPopupSettings* Settings = GetDefault<UResultPopupSettings>();
+	UClass* ResultPopupWidgetClass = Settings != nullptr ? Settings->ResultPopupWidgetClass.LoadSynchronous() : nullptr;
+	if (ResultPopupWidgetClass == nullptr)
+	{
+		ResultPopupWidgetClass = UResultPopupWidget::StaticClass();
+	}
+
+	ResultPopupWidget = CreateWidget<UResultPopupWidget>(this, ResultPopupWidgetClass);
+	if (ResultPopupWidget == nullptr)
+	{
+		return;
+	}
+
+	ResultPopupWidget->OnClosed.RemoveAll(this);
+	ResultPopupWidget->OnClosed.AddUObject(this, &AGameplayPlayerController::HandleResultPopupClosed);
+	ResultPopupWidget->AddToViewport(200);
+	ResultPopupWidget->HidePopup();
+}
+
+void AGameplayPlayerController::ToggleResultPopup()
+{
+	EnsureResultPopupWidget();
+	if (ResultPopupWidget == nullptr)
+	{
+		return;
+	}
+
+	const bool bIsVisible = ResultPopupWidget->GetVisibility() == ESlateVisibility::Visible;
+	if (bIsVisible)
+	{
+		CloseResultPopup();
+		return;
+	}
+
+	ResultPopupWidget->ShowPopup();
+
+	FInputModeGameAndUI InputMode;
+	InputMode.SetWidgetToFocus(ResultPopupWidget->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	SetInputMode(InputMode);
+
+	bShowMouseCursor = true;
+	bEnableClickEvents = true;
+	bEnableMouseOverEvents = true;
+}
+
+void AGameplayPlayerController::CloseResultPopup()
+{
+	if (ResultPopupWidget == nullptr)
+	{
+		return;
+	}
+
+	ResultPopupWidget->HidePopup();
+	HandleResultPopupClosed();
+}
+
+void AGameplayPlayerController::HandleResultPopupClosed()
+{
+	ConfigureGameplayInput();
 }

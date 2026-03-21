@@ -13,14 +13,22 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 private:
 	void ConfigureGameplayInput();
 	void RegisterGameplayMappingContexts();
 	void EnsureScreenFadeWidget();
+	void EnsureResultPopupWidget();
+	void ToggleResultPopup();
+	void CloseResultPopup();
+	void HandleResultPopupClosed();
 
 	UPROPERTY()
 	class UScreenFadeWidget* ScreenFadeWidget;
+
+	UPROPERTY()
+	class UResultPopupWidget* ResultPopupWidget;
 
 	UPROPERTY()
 	class UInputMappingContext* GameplayDefaultMappingContext;
