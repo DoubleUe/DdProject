@@ -35,6 +35,8 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Attack();
+	void RestoreAnimationBlueprint();
+	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();
 	bool CanProcessMovementInput() const;
 	void UpdateCameraZoom(float DeltaSeconds);
@@ -90,6 +92,9 @@ private:
 
 	UPROPERTY()
 	bool bAttackMovementInputBlocked = false;
+
+	UPROPERTY()
+	bool bCanTransitionFromAttackToMovement = false;
 
 	FTimerHandle AttackAnimationTimerHandle;
 };

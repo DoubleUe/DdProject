@@ -96,6 +96,7 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 {
 	bAttackMovementInputBlocked = bBlocked;
+	bCanTransitionFromAttackToMovement = !bBlocked;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -162,6 +163,8 @@ void APlayerCharacter::MoveForward(float Value)
 		return;
 	}
 
+	TryBlendToMovementAnimation();
+
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -174,6 +177,8 @@ void APlayerCharacter::MoveRight(float Value)
 	{
 		return;
 	}
+
+	TryBlendToMovementAnimation();
 
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
@@ -237,6 +242,7 @@ void APlayerCharacter::Attack()
 
 	bAttackAnimationPlaying = true;
 	bAttackMovementInputBlocked = false;
+	bCanTransitionFromAttackToMovement = false;
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
 	GetMesh()->PlayAnimation(AttackAnimation, false);
 	GetWorldTimerManager().SetTimer(
@@ -247,11 +253,8 @@ void APlayerCharacter::Attack()
 		false);
 }
 
-void APlayerCharacter::FinishAttackAnimation()
+void APlayerCharacter::RestoreAnimationBlueprint()
 {
-	bAttackAnimationPlaying = false;
-	bAttackMovementInputBlocked = false;
-
 	if (GetMesh() == nullptr || CharacterAnimBlueprintClass == nullptr)
 	{
 		return;
@@ -259,6 +262,27 @@ void APlayerCharacter::FinishAttackAnimation()
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
+}
+
+void APlayerCharacter::TryBlendToMovementAnimation()
+{
+	if (!bAttackAnimationPlaying || bAttackMovementInputBlocked || !bCanTransitionFromAttackToMovement)
+	{
+		return;
+	}
+
+	bAttackAnimationPlaying = false;
+	bCanTransitionFromAttackToMovement = false;
+	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
+	RestoreAnimationBlueprint();
+}
+
+void APlayerCharacter::FinishAttackAnimation()
+{
+	bAttackAnimationPlaying = false;
+	bAttackMovementInputBlocked = false;
+	bCanTransitionFromAttackToMovement = false;
+	RestoreAnimationBlueprint();
 }
 
 bool APlayerCharacter::CanProcessMovementInput() const
