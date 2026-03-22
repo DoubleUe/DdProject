@@ -93,6 +93,11 @@ APlayerCharacter::APlayerCharacter()
 	}
 }
 
+void APlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
+{
+	bAttackMovementInputBlocked = bBlocked;
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -152,7 +157,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 
 void APlayerCharacter::MoveForward(float Value)
 {
-	if (FMath::IsNearlyZero(Value) || Controller == nullptr)
+	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
 		return;
 	}
@@ -165,7 +170,7 @@ void APlayerCharacter::MoveForward(float Value)
 
 void APlayerCharacter::MoveRight(float Value)
 {
-	if (FMath::IsNearlyZero(Value) || Controller == nullptr)
+	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
 		return;
 	}
@@ -231,6 +236,7 @@ void APlayerCharacter::Attack()
 	}
 
 	bAttackAnimationPlaying = true;
+	bAttackMovementInputBlocked = false;
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
 	GetMesh()->PlayAnimation(AttackAnimation, false);
 	GetWorldTimerManager().SetTimer(
@@ -244,6 +250,7 @@ void APlayerCharacter::Attack()
 void APlayerCharacter::FinishAttackAnimation()
 {
 	bAttackAnimationPlaying = false;
+	bAttackMovementInputBlocked = false;
 
 	if (GetMesh() == nullptr || CharacterAnimBlueprintClass == nullptr)
 	{
@@ -252,6 +259,11 @@ void APlayerCharacter::FinishAttackAnimation()
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
+}
+
+bool APlayerCharacter::CanProcessMovementInput() const
+{
+	return !bAttackAnimationPlaying || !bAttackMovementInputBlocked;
 }
 
 void APlayerCharacter::UpdateCameraZoom(float DeltaSeconds)

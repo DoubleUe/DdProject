@@ -19,6 +19,7 @@ class TESTPROJECT_API APlayerCharacter : public ACharacter
 
 public:
 	APlayerCharacter();
+	void SetAttackMovementInputBlocked(bool bBlocked);
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +36,7 @@ private:
 	void Look(const FInputActionValue& Value);
 	void Attack();
 	void FinishAttackAnimation();
+	bool CanProcessMovementInput() const;
 	void UpdateCameraZoom(float DeltaSeconds);
 	void RefreshCameraZoomBounds();
 
@@ -85,6 +87,9 @@ private:
 
 	UPROPERTY()
 	bool bAttackAnimationPlaying = false;
+
+	UPROPERTY()
+	bool bAttackMovementInputBlocked = false;
 
 	FTimerHandle AttackAnimationTimerHandle;
 };
