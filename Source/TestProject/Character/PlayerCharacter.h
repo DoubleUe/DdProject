@@ -2,9 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TimerManager.h"
 #include "PlayerCharacter.generated.h"
 
 class UCameraComponent;
+class UClass;
+class UAnimSequenceBase;
 class UInputAction;
 class USpringArmComponent;
 struct FInputActionValue;
@@ -30,6 +33,8 @@ private:
 	void ZoomCamera(float Value);
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Attack();
+	void FinishAttackAnimation();
 	void UpdateCameraZoom(float DeltaSeconds);
 	void RefreshCameraZoomBounds();
 
@@ -71,4 +76,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInputAction> MouseLookAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Animation", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UAnimSequenceBase> AttackAnimation;
+
+	UPROPERTY()
+	TObjectPtr<UClass> CharacterAnimBlueprintClass;
+
+	UPROPERTY()
+	bool bAttackAnimationPlaying = false;
+
+	FTimerHandle AttackAnimationTimerHandle;
 };

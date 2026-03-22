@@ -1,6 +1,7 @@
 #include "PlayerCharacter.h"
 
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimSequenceBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
@@ -9,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
+#include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -55,8 +57,9 @@ APlayerCharacter::APlayerCharacter()
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprintClass(TEXT("/Game/Characters/Player/Animations/ThirdPerson_AnimBP"));
 	if (AnimBlueprintClass.Class != nullptr)
 	{
+		CharacterAnimBlueprintClass = AnimBlueprintClass.Class;
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		GetMesh()->SetAnimInstanceClass(AnimBlueprintClass.Class);
+		GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Jump.IA_Jump"));
@@ -82,6 +85,12 @@ APlayerCharacter::APlayerCharacter()
 	{
 		MouseLookAction = MouseLookActionAsset.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimSequenceBase> AttackAnimationAsset(TEXT("/Game/Characters/Player/Animations/Standing_Melee_Attack_Downward.Standing_Melee_Attack_Downward"));
+	if (AttackAnimationAsset.Succeeded())
+	{
+		AttackAnimation = AttackAnimationAsset.Object;
+	}
 }
 
 void APlayerCharacter::BeginPlay()
@@ -102,6 +111,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APlayerCharacter::Turn);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APlayerCharacter::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &APlayerCharacter::ZoomCamera);
+	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &APlayerCharacter::Attack);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
 
@@ -205,6 +215,43 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	Turn(LookAxisVector.X);
 	LookUp(LookAxisVector.Y);
+}
+
+void APlayerCharacter::Attack()
+{
+	if (bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
+	{
+		return;
+	}
+
+	const float AttackDuration = AttackAnimation->GetPlayLength();
+	if (AttackDuration <= 0.0f)
+	{
+		return;
+	}
+
+	bAttackAnimationPlaying = true;
+	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
+	GetMesh()->PlayAnimation(AttackAnimation, false);
+	GetWorldTimerManager().SetTimer(
+		AttackAnimationTimerHandle,
+		this,
+		&APlayerCharacter::FinishAttackAnimation,
+		AttackDuration,
+		false);
+}
+
+void APlayerCharacter::FinishAttackAnimation()
+{
+	bAttackAnimationPlaying = false;
+
+	if (GetMesh() == nullptr || CharacterAnimBlueprintClass == nullptr)
+	{
+		return;
+	}
+
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
 }
 
 void APlayerCharacter::UpdateCameraZoom(float DeltaSeconds)
