@@ -6,11 +6,21 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavigationSystem.h"
+#include "UObject/ConstructorHelpers.h"
 
 ATestManager::ATestManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	ZombieClass = AMonsterCharacter::StaticClass();
+
+	static ConstructorHelpers::FClassFinder<AMonsterCharacter> ZombieBlueprintClass(TEXT("/Game/Characters/Zombie/BP_ZombieMonsterCharacter"));
+	if (ZombieBlueprintClass.Succeeded())
+	{
+		ZombieClass = ZombieBlueprintClass.Class;
+	}
+	else
+	{
+		ZombieClass = AMonsterCharacter::StaticClass();
+	}
 }
 
 ATestManager* ATestManager::FindOrCreate(UWorld* World)

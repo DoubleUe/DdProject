@@ -1,6 +1,6 @@
 #include "MonsterCharacter.h"
 
-#include "AI/ZombieChaseAIController.h"
+#include "AIController.h"
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimSingleNodeInstance.h"
 #include "Animation/BlendSpace1D.h"
@@ -26,7 +26,11 @@ AMonsterCharacter::AMonsterCharacter()
 	CharacterMovementComponent->MaxWalkSpeed = 300.0f;
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 
-	AIControllerClass = AZombieChaseAIController::StaticClass();
+	static ConstructorHelpers::FClassFinder<AAIController> ZombieAiControllerClass(TEXT("/Game/Characters/Zombie/AI/BP_ZombieChaseAIController"));
+	if (ZombieAiControllerClass.Succeeded())
+	{
+		AIControllerClass = ZombieAiControllerClass.Class;
+	}
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -96.0f), FRotator(0.0f, -90.0f, 0.0f));
