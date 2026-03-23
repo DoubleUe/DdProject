@@ -49,16 +49,53 @@ void AGameplayPlayerController::SetupInputComponent()
 	if (InputComponent != nullptr)
 	{
 		InputComponent->BindKey(EKeys::LeftBracket, IE_Pressed, this, &AGameplayPlayerController::ToggleResultPopup);
+		InputComponent->BindKey(EKeys::LeftAlt, IE_Pressed, this, &AGameplayPlayerController::BeginTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::LeftAlt, IE_Released, this, &AGameplayPlayerController::EndTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::RightAlt, IE_Pressed, this, &AGameplayPlayerController::BeginTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::RightAlt, IE_Released, this, &AGameplayPlayerController::EndTemporaryCursorMode);
 	}
 }
 
 void AGameplayPlayerController::ConfigureGameplayInput()
 {
+	bTemporaryCursorModeActive = false;
+	RefreshInputMode();
+	RegisterGameplayMappingContexts();
+}
+
+void AGameplayPlayerController::RefreshInputMode()
+{
+	if (IsResultPopupOpen())
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(ResultPopupWidget->TakeWidget());
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		SetInputMode(InputMode);
+
+		bShowMouseCursor = true;
+		bEnableClickEvents = true;
+		bEnableMouseOverEvents = true;
+		return;
+	}
+
+	if (bTemporaryCursorModeActive)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetHideCursorDuringCapture(false);
+		SetInputMode(InputMode);
+
+		bShowMouseCursor = true;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
+		return;
+	}
+
 	SetInputMode(FInputModeGameOnly());
 	bShowMouseCursor = false;
 	bEnableClickEvents = false;
 	bEnableMouseOverEvents = false;
-	RegisterGameplayMappingContexts();
 }
 
 void AGameplayPlayerController::RegisterGameplayMappingContexts()
@@ -166,15 +203,7 @@ void AGameplayPlayerController::ToggleResultPopup()
 	}
 
 	ResultPopupWidget->ShowPopup();
-
-	FInputModeGameAndUI InputMode;
-	InputMode.SetWidgetToFocus(ResultPopupWidget->TakeWidget());
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	SetInputMode(InputMode);
-
-	bShowMouseCursor = true;
-	bEnableClickEvents = true;
-	bEnableMouseOverEvents = true;
+	RefreshInputMode();
 }
 
 void AGameplayPlayerController::CloseResultPopup()
@@ -190,5 +219,33 @@ void AGameplayPlayerController::CloseResultPopup()
 
 void AGameplayPlayerController::HandleResultPopupClosed()
 {
-	ConfigureGameplayInput();
+	RefreshInputMode();
+}
+
+void AGameplayPlayerController::BeginTemporaryCursorMode()
+{
+	if (bTemporaryCursorModeActive)
+	{
+		return;
+	}
+
+	bTemporaryCursorModeActive = true;
+	RefreshInputMode();
+}
+
+void AGameplayPlayerController::EndTemporaryCursorMode()
+{
+	if (!bTemporaryCursorModeActive)
+	{
+		return;
+	}
+
+	bTemporaryCursorModeActive = false;
+	RefreshInputMode();
+}
+
+bool AGameplayPlayerController::IsResultPopupOpen() const
+{
+	return ResultPopupWidget != nullptr
+		&& ResultPopupWidget->GetVisibility() == ESlateVisibility::Visible;
 }

@@ -17,12 +17,16 @@ protected:
 
 private:
 	void ConfigureGameplayInput();
+	void RefreshInputMode();
 	void RegisterGameplayMappingContexts();
 	void EnsureScreenFadeWidget();
 	void EnsureResultPopupWidget();
 	void ToggleResultPopup();
 	void CloseResultPopup();
 	void HandleResultPopupClosed();
+	void BeginTemporaryCursorMode();
+	void EndTemporaryCursorMode();
+	bool IsResultPopupOpen() const;
 
 	UPROPERTY()
 	class UScreenFadeWidget* ScreenFadeWidget;
@@ -35,4 +39,7 @@ private:
 
 	UPROPERTY()
 	class UInputMappingContext* GameplayMouseLookMappingContext;
+
+	UPROPERTY()
+	bool bTemporaryCursorModeActive = false;
 };
