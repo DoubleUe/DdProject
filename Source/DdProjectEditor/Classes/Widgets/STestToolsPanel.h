@@ -9,13 +9,13 @@ public:
 	SLATE_BEGIN_ARGS(STestToolsPanel)
 	{
 	}
-		SLATE_EVENT(FSimpleDelegate, OnRunZombiePatrolTest)
+		SLATE_EVENT(FSimpleDelegate, OnSpawnZombie)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
 
 private:
-	FReply HandleRunZombiePatrolTestClicked();
+	FReply HandleSpawnZombieClicked();
 
-	FSimpleDelegate OnRunZombiePatrolTest;
+	FSimpleDelegate OnSpawnZombie;
 };

@@ -1,13 +1,16 @@
 #include "TestManager.h"
 
+#include "Character/MonsterCharacter.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
-#include "ZombiePatrolTestCharacter.h"
+#include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
+#include "NavigationSystem.h"
 
 ATestManager::ATestManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	PatrolZombieClass = AZombiePatrolTestCharacter::StaticClass();
+	ZombieClass = AMonsterCharacter::StaticClass();
 }
 
 ATestManager* ATestManager::FindOrCreate(UWorld* World)
@@ -52,34 +55,27 @@ void ATestManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (bRunZombiePatrolTestOnBeginPlay)
+	if (bSpawnZombieOnBeginPlay)
 	{
-		RunZombiePatrolTest();
+		SpawnZombie();
 	}
 }
 
-void ATestManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
+AMonsterCharacter* ATestManager::SpawnZombie()
 {
-	StopZombiePatrolTest();
-
-	Super::EndPlay(EndPlayReason);
-}
-
-AZombiePatrolTestCharacter* ATestManager::RunZombiePatrolTest()
-{
-	if (IsValid(SpawnedPatrolZombie))
-	{
-		return SpawnedPatrolZombie;
-	}
-
 	UWorld* World = GetWorld();
-	if (World == nullptr || PatrolZombieClass == nullptr)
+	if (World == nullptr || ZombieClass == nullptr)
 	{
 		return nullptr;
 	}
 
-	const FVector SpawnLocation = GetActorLocation() + SpawnOffset;
-	const FRotator SpawnRotation = GetActorRotation();
+	FVector SpawnLocation = FVector::ZeroVector;
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	if (!TryResolveZombieSpawn(SpawnLocation, SpawnRotation))
+	{
+		return nullptr;
+	}
+
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Owner = this;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -90,27 +86,83 @@ AZombiePatrolTestCharacter* ATestManager::RunZombiePatrolTest()
 		SpawnParameters.ObjectFlags |= RF_Transient;
 	}
 
-	SpawnedPatrolZombie = World->SpawnActor<AZombiePatrolTestCharacter>(
-		PatrolZombieClass,
+	AMonsterCharacter* SpawnedZombie = World->SpawnActor<AMonsterCharacter>(
+		ZombieClass,
 		SpawnLocation,
 		SpawnRotation,
 		SpawnParameters);
 
-	return SpawnedPatrolZombie;
-}
-
-void ATestManager::StopZombiePatrolTest()
-{
-	if (!IsValid(SpawnedPatrolZombie))
+	if (IsValid(SpawnedZombie) && World->IsGameWorld() && SpawnedZombie->GetController() == nullptr)
 	{
-		return;
+		SpawnedZombie->SpawnDefaultController();
 	}
 
-	SpawnedPatrolZombie->Destroy();
-	SpawnedPatrolZombie = nullptr;
+	return SpawnedZombie;
 }
 
-bool ATestManager::IsZombiePatrolTestRunning() const
+ACharacter* ATestManager::FindTargetCharacter() const
 {
-	return IsValid(SpawnedPatrolZombie);
+	UWorld* World = GetWorld();
+	return World != nullptr ? UGameplayStatics::GetPlayerCharacter(World, 0) : nullptr;
+}
+
+bool ATestManager::TryResolveZombieSpawn(FVector& OutSpawnLocation, FRotator& OutSpawnRotation) const
+{
+	ACharacter* TargetCharacter = FindTargetCharacter();
+	if (!IsValid(TargetCharacter))
+	{
+		return false;
+	}
+
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		return false;
+	}
+
+	const FVector TargetLocation = TargetCharacter->GetActorLocation();
+	const float MinimumSpawnDistance = FMath::Min(SpawnRadius, 200.0f);
+	bool bFoundSpawn = false;
+
+	if (UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(World))
+	{
+		if (NavigationSystem->GetDefaultNavDataInstance(FNavigationSystem::DontCreate) != nullptr)
+		{
+			for (int32 AttemptIndex = 0; AttemptIndex < 8; ++AttemptIndex)
+			{
+				FNavLocation CandidateLocation;
+				if (NavigationSystem->GetRandomReachablePointInRadius(TargetLocation, SpawnRadius, CandidateLocation)
+					&& FVector::DistSquared2D(CandidateLocation.Location, TargetLocation) >= FMath::Square(MinimumSpawnDistance))
+				{
+					OutSpawnLocation = CandidateLocation.Location;
+					bFoundSpawn = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!bFoundSpawn)
+	{
+		FVector2D RandomOffset = FMath::RandPointInCircle(SpawnRadius);
+		if (RandomOffset.IsNearlyZero())
+		{
+			RandomOffset = FVector2D(MinimumSpawnDistance, 0.0f);
+		}
+		else if (RandomOffset.SizeSquared() < FMath::Square(MinimumSpawnDistance))
+		{
+			RandomOffset = RandomOffset.GetSafeNormal() * MinimumSpawnDistance;
+		}
+
+		OutSpawnLocation = TargetLocation + FVector(RandomOffset.X, RandomOffset.Y, 0.0f);
+		OutSpawnLocation.Z = TargetLocation.Z;
+	}
+
+	FVector ToTarget = TargetLocation - OutSpawnLocation;
+	ToTarget.Z = 0.0f;
+	OutSpawnRotation = ToTarget.IsNearlyZero()
+		? TargetCharacter->GetActorRotation()
+		: ToTarget.Rotation();
+
+	return true;
 }

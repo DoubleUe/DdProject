@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimationAsset.h"
+#include "Animation/BlendSpace1D.h"
 #include "GameFramework/Character.h"
 #include "MonsterCharacter.generated.h"
 
@@ -18,7 +19,11 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
-	void UpdateMovementAnimation();
+	void LoadAnimationAssets();
+	void UpdateMovementAnimation(float DeltaSeconds);
+
+	UPROPERTY()
+	TObjectPtr<UBlendSpace1D> IdleRunBlendSpace;
 
 	UPROPERTY()
 	TObjectPtr<UAnimationAsset> IdleAnimation;
@@ -28,4 +33,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAnimationAsset> CurrentLoopAnimation;
+
+	FVector PreviousAnimationLocation;
+	bool bHasPreviousAnimationLocation;
+	float LastLoggedBlendSpeed;
 };

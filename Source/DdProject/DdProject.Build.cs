@@ -11,7 +11,7 @@ public class DdProject : ModuleRules
 		PublicIncludePaths.Add(ModuleDirectory + "/Classes");
 		PrivateIncludePaths.Add(ModuleDirectory + "/Classes");
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "DeveloperSettings" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "DeveloperSettings", "AIModule", "NavigationSystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 

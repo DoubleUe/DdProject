@@ -9,7 +9,7 @@
 FDdProjectEditorCommands::FDdProjectEditorCommands()
 	: TCommands<FDdProjectEditorCommands>(
 		TEXT("DdProjectEditor"),
-		LOCTEXT("ContextDescription", "Test Project Editor"),
+		LOCTEXT("ContextDescription", "DdProject Zombie Spawn Tools"),
 		NAME_None,
 		FAppStyle::GetAppStyleSetName())
 {
@@ -19,8 +19,8 @@ void FDdProjectEditorCommands::RegisterCommands()
 {
 	UI_COMMAND(
 		OpenTestToolsWindow,
-		"Open Test Tools",
-		"Open the Test Tools window.",
+		"Open Zombie Spawn Tools",
+		"Open the zombie spawn tools window.",
 		EUserInterfaceActionType::Button,
 		FInputChord(EKeys::RightBracket));
 }

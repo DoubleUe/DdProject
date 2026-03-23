@@ -18,7 +18,7 @@ public:
 
 private:
 	void OpenTestToolsWindow();
-	void RunZombiePatrolTest();
+	void SpawnZombieFromTools();
 	TSharedRef<SDockTab> SpawnTestToolsTab(const FSpawnTabArgs& SpawnTabArgs);
 	UWorld* GetTargetWorld() const;
 	void ShowNotification(const FText& Message) const;

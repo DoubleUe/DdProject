@@ -12,7 +12,7 @@
 
 void STestToolsPanel::Construct(const FArguments& InArgs)
 {
-	OnRunZombiePatrolTest = InArgs._OnRunZombiePatrolTest;
+	OnSpawnZombie = InArgs._OnSpawnZombie;
 
 	ChildSlot
 	[
@@ -25,7 +25,7 @@ void STestToolsPanel::Construct(const FArguments& InArgs)
 			.AutoHeight()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("Title", "Test Tools"))
+				.Text(LOCTEXT("Title", "Zombie Spawn Tools"))
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
@@ -33,7 +33,7 @@ void STestToolsPanel::Construct(const FArguments& InArgs)
 			[
 				SNew(STextBlock)
 				.AutoWrapText(true)
-				.Text(LOCTEXT("Description", "Temporary entry points for runtime test flows. Use PIE or Simulate to observe character movement tests."))
+				.Text(LOCTEXT("Description", "Spawn zombies into the current world. Spawned and placed zombies will automatically chase the player during gameplay."))
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
@@ -45,7 +45,7 @@ void STestToolsPanel::Construct(const FArguments& InArgs)
 			.AutoHeight()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("ZombiePatrolLabel", "Zombie Patrol Test"))
+				.Text(LOCTEXT("SpawnZombieLabel", "Spawn Zombie"))
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
@@ -53,25 +53,25 @@ void STestToolsPanel::Construct(const FArguments& InArgs)
 			[
 				SNew(STextBlock)
 				.AutoWrapText(true)
-				.Text(LOCTEXT("ZombiePatrolDescription", "Find or create TestManager in the current world, then run the zombie forward/back patrol test."))
+				.Text(LOCTEXT("SpawnZombieDescription", "Find or create TestManager and spawn a zombie at a random position within 10 meters of the player."))
 			]
 			+ SVerticalBox::Slot()
 			.AutoHeight()
 			.Padding(0.0f, 12.0f, 0.0f, 0.0f)
 			[
 				SNew(SButton)
-				.Text(LOCTEXT("RunZombiePatrolButton", "Run Zombie Patrol Test"))
-				.OnClicked(this, &STestToolsPanel::HandleRunZombiePatrolTestClicked)
+				.Text(LOCTEXT("SpawnZombieButton", "Spawn Zombie"))
+				.OnClicked(this, &STestToolsPanel::HandleSpawnZombieClicked)
 			]
 		]
 	];
 }
 
-FReply STestToolsPanel::HandleRunZombiePatrolTestClicked()
+FReply STestToolsPanel::HandleSpawnZombieClicked()
 {
-	if (OnRunZombiePatrolTest.IsBound())
+	if (OnSpawnZombie.IsBound())
 	{
-		OnRunZombiePatrolTest.Execute();
+		OnSpawnZombie.Execute();
 	}
 
 	return FReply::Handled();

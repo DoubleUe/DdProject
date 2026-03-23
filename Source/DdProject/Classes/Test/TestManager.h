@@ -4,7 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "TestManager.generated.h"
 
-class AZombiePatrolTestCharacter;
+class ACharacter;
+class AMonsterCharacter;
 class UWorld;
 
 UCLASS()
@@ -17,30 +18,23 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	static ATestManager* FindOrCreate(UWorld* World);
 
 	UPROPERTY(EditAnywhere, Category = "Test")
-	TSubclassOf<AZombiePatrolTestCharacter> PatrolZombieClass;
+	TSubclassOf<AMonsterCharacter> ZombieClass;
 
 	UPROPERTY(EditAnywhere, Category = "Test")
-	FVector SpawnOffset = FVector::ZeroVector;
+	float SpawnRadius = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Test")
-	bool bRunZombiePatrolTestOnBeginPlay = false;
+	bool bSpawnZombieOnBeginPlay = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Test")
-	AZombiePatrolTestCharacter* RunZombiePatrolTest();
-
-	UFUNCTION(BlueprintCallable, Category = "Test")
-	void StopZombiePatrolTest();
-
-	UFUNCTION(BlueprintPure, Category = "Test")
-	bool IsZombiePatrolTestRunning() const;
+	AMonsterCharacter* SpawnZombie();
 
 private:
-	UPROPERTY(Transient)
-	TObjectPtr<AZombiePatrolTestCharacter> SpawnedPatrolZombie;
+	ACharacter* FindTargetCharacter() const;
+	bool TryResolveZombieSpawn(FVector& OutSpawnLocation, FRotator& OutSpawnRotation) const;
 };

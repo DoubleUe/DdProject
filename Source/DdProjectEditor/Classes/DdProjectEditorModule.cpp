@@ -10,7 +10,6 @@
 #include "LevelEditor.h"
 #include "Modules/ModuleManager.h"
 #include "Test/TestManager.h"
-#include "Test/ZombiePatrolTestCharacter.h"
 #include "Commands/DdProjectEditorCommands.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Notifications/SNotificationList.h"
@@ -89,6 +88,11 @@ IMPLEMENT_MODULE(FDdProjectEditorModule, DdProjectEditor)
 
 void FDdProjectEditorModule::StartupModule()
 {
+	if (IsRunningCommandlet())
+	{
+		return;
+	}
+
 	FDdProjectEditorCommands::Register();
 
 	EditorCommands = MakeShared<FUICommandList>();
@@ -109,13 +113,18 @@ void FDdProjectEditorModule::StartupModule()
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
 		TestToolsTabName,
 		FOnSpawnTab::CreateRaw(this, &FDdProjectEditorModule::SpawnTestToolsTab))
-		.SetDisplayName(LOCTEXT("TestToolsTabTitle", "Test Tools"))
-		.SetTooltipText(LOCTEXT("TestToolsTabTooltip", "Open the Test Tools window."))
+		.SetDisplayName(LOCTEXT("TestToolsTabTitle", "Zombie Spawn Tools"))
+		.SetTooltipText(LOCTEXT("TestToolsTabTooltip", "Open the zombie spawn tools window."))
 		.SetGroup(WorkspaceMenu::GetMenuStructure().GetDeveloperToolsMiscCategory());
 }
 
 void FDdProjectEditorModule::ShutdownModule()
 {
+	if (IsRunningCommandlet())
+	{
+		return;
+	}
+
 	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
 	{
 		FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
@@ -142,12 +151,12 @@ void FDdProjectEditorModule::OpenTestToolsWindow()
 	FGlobalTabmanager::Get()->TryInvokeTab(FTabId(TestToolsTabName));
 }
 
-void FDdProjectEditorModule::RunZombiePatrolTest()
+void FDdProjectEditorModule::SpawnZombieFromTools()
 {
 	UWorld* World = GetTargetWorld();
 	if (World == nullptr)
 	{
-		ShowNotification(LOCTEXT("NoWorld", "No target world is available for the test."));
+		ShowNotification(LOCTEXT("NoWorld", "No target world is available for zombie spawning."));
 		return;
 	}
 
@@ -158,37 +167,30 @@ void FDdProjectEditorModule::RunZombiePatrolTest()
 		return;
 	}
 
-	const bool bWasRunning = TestManager->IsZombiePatrolTestRunning();
-	AZombiePatrolTestCharacter* SpawnedZombie = TestManager->RunZombiePatrolTest();
+	AMonsterCharacter* SpawnedZombie = TestManager->SpawnZombie();
 	if (SpawnedZombie == nullptr)
 	{
-		ShowNotification(LOCTEXT("ZombiePatrolFailed", "Zombie Patrol Test failed to start."));
-		return;
-	}
-
-	if (bWasRunning)
-	{
-		ShowNotification(LOCTEXT("ZombiePatrolAlreadyRunning", "Zombie Patrol Test is already running."));
+		ShowNotification(LOCTEXT("SpawnZombieFailed", "Failed to spawn a zombie. Make sure a player character exists in the current world."));
 		return;
 	}
 
 	if (GEditor != nullptr && GEditor->PlayWorld == World)
 	{
-		ShowNotification(LOCTEXT("ZombiePatrolStartedInPlayWorld", "Zombie Patrol Test started in the current play world."));
+		ShowNotification(LOCTEXT("ZombieSpawnedInPlayWorld", "Zombie spawned near the player in the current play world."));
 		return;
 	}
 
-	ShowNotification(LOCTEXT("ZombiePatrolSpawnedInEditor", "Zombie Patrol Test actor spawned in the editor world. Use PIE or Simulate to see movement."));
+	ShowNotification(LOCTEXT("ZombieSpawnedInEditor", "Zombie spawned in the editor world."));
 }
 
 TSharedRef<SDockTab> FDdProjectEditorModule::SpawnTestToolsTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
-		.Label(LOCTEXT("TestToolsTabLabel", "Test Tools"))
+		.Label(LOCTEXT("TestToolsTabLabel", "Zombie Spawn Tools"))
 		[
 			SNew(STestToolsPanel)
-			.OnRunZombiePatrolTest(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::RunZombiePatrolTest))
+			.OnSpawnZombie(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieFromTools))
 		];
 }
 
