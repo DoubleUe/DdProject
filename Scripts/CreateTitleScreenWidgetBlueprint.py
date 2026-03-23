@@ -3,7 +3,7 @@ import unreal
 WIDGET_BP_PATH = "/Game/UI/WBP_TitleScreen"
 WIDGET_BP_NAME = "WBP_TitleScreen"
 WIDGET_BP_DIR = "/Game/UI"
-PARENT_CLASS_PATH = "/Script/TestProject.TitleScreenWidget"
+PARENT_CLASS_PATH = "/Script/DdProject.TitleScreenWidget"
 START_BUTTON_TEXTURE_PATH = "/Game/UI/Resource/StartButton.StartButton"
 
 

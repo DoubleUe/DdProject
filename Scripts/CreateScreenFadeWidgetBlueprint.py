@@ -3,7 +3,7 @@ import unreal
 WIDGET_BP_PATH = "/Game/UI/WBP_ScreenFade"
 WIDGET_BP_NAME = "WBP_ScreenFade"
 WIDGET_BP_DIR = "/Game/UI"
-PARENT_CLASS_PATH = "/Script/TestProject.ScreenFadeWidget"
+PARENT_CLASS_PATH = "/Script/DdProject.ScreenFadeWidget"
 
 
 def find_root_canvas_name(widget_bp):

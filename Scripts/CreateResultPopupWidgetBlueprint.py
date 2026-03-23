@@ -3,7 +3,7 @@ import unreal
 WIDGET_BP_PATH = "/Game/UI/WBP_ResultPopup"
 WIDGET_BP_NAME = "WBP_ResultPopup"
 WIDGET_BP_DIR = "/Game/UI"
-PARENT_CLASS_PATH = "/Script/TestProject.ResultPopupWidget"
+PARENT_CLASS_PATH = "/Script/DdProject.ResultPopupWidget"
 
 
 def create_widget_blueprint():

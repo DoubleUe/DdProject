@@ -3,7 +3,7 @@ import unreal
 BLUEPRINT_DIR = "/Game/Characters/Zombie"
 BLUEPRINT_NAME = "BP_ZombieMonsterCharacter"
 BLUEPRINT_PATH = f"{BLUEPRINT_DIR}/{BLUEPRINT_NAME}"
-PARENT_CLASS_PATH = "/Script/TestProject.MonsterCharacter"
+PARENT_CLASS_PATH = "/Script/DdProject.MonsterCharacter"
 
 
 def create_blueprint():
