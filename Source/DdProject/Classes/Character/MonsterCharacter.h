@@ -36,5 +36,4 @@ private:
 
 	FVector PreviousAnimationLocation;
 	bool bHasPreviousAnimationLocation;
-	float LastLoggedBlendSpeed;
 };

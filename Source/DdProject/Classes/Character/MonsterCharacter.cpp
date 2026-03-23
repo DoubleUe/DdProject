@@ -56,7 +56,6 @@ AMonsterCharacter::AMonsterCharacter()
 	CurrentLoopAnimation = nullptr;
 	PreviousAnimationLocation = FVector::ZeroVector;
 	bHasPreviousAnimationLocation = false;
-	LastLoggedBlendSpeed = -1.0f;
 }
 
 void AMonsterCharacter::BeginPlay()
@@ -96,7 +95,6 @@ void AMonsterCharacter::LoadAnimationAssets()
 	}
 
 	CurrentLoopAnimation = nullptr;
-	LastLoggedBlendSpeed = -1.0f;
 }
 
 void AMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
@@ -142,8 +140,6 @@ void AMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 
 	if (!bIsMoving)
 	{
-		LastLoggedBlendSpeed = -1.0f;
-
 		if (IdleAnimation == nullptr || CurrentLoopAnimation == IdleAnimation)
 		{
 			return;
@@ -170,14 +166,6 @@ void AMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 			}
 
 			const float BlendSpeed = FMath::Clamp(Speed2D, 0.0f, 300.0f);
-
-#if WITH_EDITOR
-			if (!FMath::IsNearlyEqual(LastLoggedBlendSpeed, BlendSpeed, 1.0f))
-			{
-				UE_LOG(LogTemp, Log, TEXT("%s BlendSpeed: %.2f"), *GetName(), BlendSpeed);
-				LastLoggedBlendSpeed = BlendSpeed;
-			}
-#endif
 
 			SingleNodeInstance->SetPlaying(true);
 			SingleNodeInstance->SetLooping(true);
