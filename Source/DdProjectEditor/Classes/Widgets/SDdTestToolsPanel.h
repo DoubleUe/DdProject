@@ -3,10 +3,10 @@
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
 
-class STestToolsPanel : public SCompoundWidget
+class SDdTestToolsPanel : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(STestToolsPanel)
+	SLATE_BEGIN_ARGS(SDdTestToolsPanel)
 	{
 	}
 		SLATE_EVENT(FSimpleDelegate, OnSpawnZombie)

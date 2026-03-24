@@ -13,7 +13,7 @@
 #include "Commands/DdProjectEditorCommands.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "Widgets/STestToolsPanel.h"
+#include "Widgets/SDdTestToolsPanel.h"
 #include "WorkspaceMenuStructure.h"
 #include "WorkspaceMenuStructureModule.h"
 
@@ -189,7 +189,7 @@ TSharedRef<SDockTab> FDdProjectEditorModule::SpawnTestToolsTab(const FSpawnTabAr
 		.TabRole(ETabRole::NomadTab)
 		.Label(LOCTEXT("TestToolsTabLabel", "Zombie Spawn Tools"))
 		[
-			SNew(STestToolsPanel)
+			SNew(SDdTestToolsPanel)
 			.OnSpawnZombie(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieFromTools))
 		];
 }

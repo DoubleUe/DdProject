@@ -1,4 +1,4 @@
-#include "STestToolsPanel.h"
+#include "SDdTestToolsPanel.h"
 
 #include "Input/Reply.h"
 #include "Styling/AppStyle.h"
@@ -8,9 +8,9 @@
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
 
-#define LOCTEXT_NAMESPACE "STestToolsPanel"
+#define LOCTEXT_NAMESPACE "SDdTestToolsPanel"
 
-void STestToolsPanel::Construct(const FArguments& InArgs)
+void SDdTestToolsPanel::Construct(const FArguments& InArgs)
 {
 	OnSpawnZombie = InArgs._OnSpawnZombie;
 
@@ -61,13 +61,13 @@ void STestToolsPanel::Construct(const FArguments& InArgs)
 			[
 				SNew(SButton)
 				.Text(LOCTEXT("SpawnZombieButton", "Spawn Zombie"))
-				.OnClicked(this, &STestToolsPanel::HandleSpawnZombieClicked)
+				.OnClicked(this, &SDdTestToolsPanel::HandleSpawnZombieClicked)
 			]
 		]
 	];
 }
 
-FReply STestToolsPanel::HandleSpawnZombieClicked()
+FReply SDdTestToolsPanel::HandleSpawnZombieClicked()
 {
 	if (OnSpawnZombie.IsBound())
 	{
