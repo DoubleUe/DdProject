@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "TitleScreenWidget.generated.h"
+#include "DdTitleScreenWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnStartGameRequested);
 
 UCLASS()
-class DDPROJECT_API UTitleScreenWidget : public UUserWidget
+class DDPROJECT_API UDdTitleScreenWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

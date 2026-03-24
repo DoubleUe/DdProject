@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "ResultPopupWidget.generated.h"
+#include "DdResultPopupWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnResultPopupClosed);
 
 UCLASS()
-class DDPROJECT_API UResultPopupWidget : public UUserWidget
+class DDPROJECT_API UDdResultPopupWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

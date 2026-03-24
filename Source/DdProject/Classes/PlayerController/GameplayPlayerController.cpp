@@ -6,10 +6,10 @@
 #include "InputMappingContext.h"
 #include "InputCoreTypes.h"
 #include "UObject/ConstructorHelpers.h"
-#include "../UI/Gameplay/ResultPopupSettings.h"
-#include "../UI/Gameplay/ResultPopupWidget.h"
-#include "../UI/Title/ScreenFadeWidget.h"
-#include "../UI/Title/TitleScreenSettings.h"
+#include "../UI/Gameplay/DdResultPopupSettings.h"
+#include "../UI/Gameplay/DdResultPopupWidget.h"
+#include "../UI/Title/DdScreenFadeWidget.h"
+#include "../UI/Title/DdTitleScreenSettings.h"
 
 AGameplayPlayerController::AGameplayPlayerController()
 {
@@ -33,7 +33,7 @@ void AGameplayPlayerController::BeginPlay()
 	EnsureScreenFadeWidget();
 	EnsureResultPopupWidget();
 
-	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (ScreenFadeWidget != nullptr && Settings != nullptr)
 	{
 		ScreenFadeWidget->StartFade(ScreenFadeWidget->GetFadeAlpha(), 0.0f, Settings->FadeInDuration);
@@ -129,11 +129,11 @@ void AGameplayPlayerController::EnsureScreenFadeWidget()
 	if (ScreenFadeWidget == nullptr)
 	{
 		TArray<UUserWidget*> FoundWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UScreenFadeWidget::StaticClass(), false);
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UDdScreenFadeWidget::StaticClass(), false);
 
 		for (UUserWidget* FoundWidget : FoundWidgets)
 		{
-			if (UScreenFadeWidget* ExistingFadeWidget = Cast<UScreenFadeWidget>(FoundWidget))
+			if (UDdScreenFadeWidget* ExistingFadeWidget = Cast<UDdScreenFadeWidget>(FoundWidget))
 			{
 				ScreenFadeWidget = ExistingFadeWidget;
 				break;
@@ -146,14 +146,14 @@ void AGameplayPlayerController::EnsureScreenFadeWidget()
 		return;
 	}
 
-	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	UClass* ScreenFadeWidgetClass = Settings != nullptr ? Settings->ScreenFadeWidgetClass.LoadSynchronous() : nullptr;
 	if (ScreenFadeWidgetClass == nullptr)
 	{
-		ScreenFadeWidgetClass = UScreenFadeWidget::StaticClass();
+		ScreenFadeWidgetClass = UDdScreenFadeWidget::StaticClass();
 	}
 
-	ScreenFadeWidget = CreateWidget<UScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
+	ScreenFadeWidget = CreateWidget<UDdScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
 	if (ScreenFadeWidget != nullptr)
 	{
 		ScreenFadeWidget->AddToViewport(1000);
@@ -168,14 +168,14 @@ void AGameplayPlayerController::EnsureResultPopupWidget()
 		return;
 	}
 
-	const UResultPopupSettings* Settings = GetDefault<UResultPopupSettings>();
+	const UDdResultPopupSettings* Settings = GetDefault<UDdResultPopupSettings>();
 	UClass* ResultPopupWidgetClass = Settings != nullptr ? Settings->ResultPopupWidgetClass.LoadSynchronous() : nullptr;
 	if (ResultPopupWidgetClass == nullptr)
 	{
-		ResultPopupWidgetClass = UResultPopupWidget::StaticClass();
+		ResultPopupWidgetClass = UDdResultPopupWidget::StaticClass();
 	}
 
-	ResultPopupWidget = CreateWidget<UResultPopupWidget>(this, ResultPopupWidgetClass);
+	ResultPopupWidget = CreateWidget<UDdResultPopupWidget>(this, ResultPopupWidgetClass);
 	if (ResultPopupWidget == nullptr)
 	{
 		return;

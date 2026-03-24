@@ -29,10 +29,10 @@ private:
 	bool IsResultPopupOpen() const;
 
 	UPROPERTY()
-	class UScreenFadeWidget* ScreenFadeWidget;
+	class UDdScreenFadeWidget* ScreenFadeWidget;
 
 	UPROPERTY()
-	class UResultPopupWidget* ResultPopupWidget;
+	class UDdResultPopupWidget* ResultPopupWidget;
 
 	UPROPERTY()
 	class UInputMappingContext* GameplayDefaultMappingContext;

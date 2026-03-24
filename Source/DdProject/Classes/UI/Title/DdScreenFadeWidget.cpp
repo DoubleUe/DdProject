@@ -1,23 +1,23 @@
-#include "ScreenFadeWidget.h"
+#include "DdScreenFadeWidget.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 
-float UScreenFadeWidget::GetFadeAlpha() const
+float UDdScreenFadeWidget::GetFadeAlpha() const
 {
 	return CurrentFadeAlpha;
 }
 
-void UScreenFadeWidget::SetFadeAlpha(float InAlpha)
+void UDdScreenFadeWidget::SetFadeAlpha(float InAlpha)
 {
 	CurrentFadeAlpha = FMath::Clamp(InAlpha, 0.0f, 1.0f);
 	SetRenderOpacity(CurrentFadeAlpha);
 	SetVisibility(ESlateVisibility::HitTestInvisible);
 }
 
-void UScreenFadeWidget::StartFade(float FromAlpha, float ToAlpha, float Duration)
+void UDdScreenFadeWidget::StartFade(float FromAlpha, float ToAlpha, float Duration)
 {
 	FadeElapsedTime = 0.0f;
 	FadeDuration = FMath::Max(Duration, 0.0f);
@@ -34,7 +34,7 @@ void UScreenFadeWidget::StartFade(float FromAlpha, float ToAlpha, float Duration
 	}
 }
 
-void UScreenFadeWidget::NativeConstruct()
+void UDdScreenFadeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -43,7 +43,7 @@ void UScreenFadeWidget::NativeConstruct()
 	SetFadeAlpha(CurrentFadeAlpha);
 }
 
-void UScreenFadeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UDdScreenFadeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
@@ -69,7 +69,7 @@ void UScreenFadeWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	OnFadeFinished.Broadcast();
 }
 
-void UScreenFadeWidget::EnsureFadeImage()
+void UDdScreenFadeWidget::EnsureFadeImage()
 {
 	if (WidgetTree == nullptr)
 	{

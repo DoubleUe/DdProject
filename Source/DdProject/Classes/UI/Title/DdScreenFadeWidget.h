@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "ScreenFadeWidget.generated.h"
+#include "DdScreenFadeWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnScreenFadeFinished);
 
 UCLASS()
-class DDPROJECT_API UScreenFadeWidget : public UUserWidget
+class DDPROJECT_API UDdScreenFadeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

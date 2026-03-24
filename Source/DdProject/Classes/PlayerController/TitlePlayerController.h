@@ -20,10 +20,10 @@ private:
 	void OpenPendingLevel();
 
 	UPROPERTY()
-	class UTitleScreenWidget* TitleScreenWidget;
+	class UDdTitleScreenWidget* TitleScreenWidget;
 
 	UPROPERTY()
-	class UScreenFadeWidget* ScreenFadeWidget;
+	class UDdScreenFadeWidget* ScreenFadeWidget;
 
 	FName PendingLevelName;
 

@@ -1,6 +1,6 @@
-#include "TitleScreenSettings.h"
+#include "DdTitleScreenSettings.h"
 
-UTitleScreenSettings::UTitleScreenSettings()
+UDdTitleScreenSettings::UDdTitleScreenSettings()
 {
 	TitleLevelName = TEXT("/Game/Maps/TitleLevel");
 	GameLevelName = TEXT("/Game/Maps/GameLevel");

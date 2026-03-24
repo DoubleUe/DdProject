@@ -2,9 +2,9 @@
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "../UI/Title/ScreenFadeWidget.h"
-#include "../UI/Title/TitleScreenSettings.h"
-#include "../UI/Title/TitleScreenWidget.h"
+#include "../UI/Title/DdScreenFadeWidget.h"
+#include "../UI/Title/DdTitleScreenSettings.h"
+#include "../UI/Title/DdTitleScreenWidget.h"
 
 void ATitlePlayerController::BeginPlay()
 {
@@ -12,7 +12,7 @@ void ATitlePlayerController::BeginPlay()
 
 	EnsureScreenFadeWidget();
 
-	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (ScreenFadeWidget != nullptr && Settings != nullptr)
 	{
 		ScreenFadeWidget->StartFade(ScreenFadeWidget->GetFadeAlpha(), 0.0f, Settings->FadeInDuration);
@@ -41,11 +41,11 @@ void ATitlePlayerController::EnsureScreenFadeWidget()
 	if (ScreenFadeWidget == nullptr)
 	{
 		TArray<UUserWidget*> FoundWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UScreenFadeWidget::StaticClass(), false);
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UDdScreenFadeWidget::StaticClass(), false);
 
 		for (UUserWidget* FoundWidget : FoundWidgets)
 		{
-			if (UScreenFadeWidget* ExistingFadeWidget = Cast<UScreenFadeWidget>(FoundWidget))
+			if (UDdScreenFadeWidget* ExistingFadeWidget = Cast<UDdScreenFadeWidget>(FoundWidget))
 			{
 				ScreenFadeWidget = ExistingFadeWidget;
 				break;
@@ -55,14 +55,14 @@ void ATitlePlayerController::EnsureScreenFadeWidget()
 
 	if (ScreenFadeWidget == nullptr)
 	{
-		const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+		const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 		UClass* ScreenFadeWidgetClass = Settings != nullptr ? Settings->ScreenFadeWidgetClass.LoadSynchronous() : nullptr;
 		if (ScreenFadeWidgetClass == nullptr)
 		{
-			ScreenFadeWidgetClass = UScreenFadeWidget::StaticClass();
+			ScreenFadeWidgetClass = UDdScreenFadeWidget::StaticClass();
 		}
 
-		ScreenFadeWidget = CreateWidget<UScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
+		ScreenFadeWidget = CreateWidget<UDdScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
 		if (ScreenFadeWidget != nullptr)
 		{
 			ScreenFadeWidget->AddToViewport(1000);
@@ -84,7 +84,7 @@ void ATitlePlayerController::ShowTitleScreen()
 		return;
 	}
 
-	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (Settings == nullptr)
 	{
 		return;
@@ -93,10 +93,10 @@ void ATitlePlayerController::ShowTitleScreen()
 	UClass* TitleWidgetClass = Settings->TitleScreenWidgetClass.LoadSynchronous();
 	if (TitleWidgetClass == nullptr)
 	{
-		TitleWidgetClass = UTitleScreenWidget::StaticClass();
+		TitleWidgetClass = UDdTitleScreenWidget::StaticClass();
 	}
 
-	TitleScreenWidget = CreateWidget<UTitleScreenWidget>(this, TitleWidgetClass);
+	TitleScreenWidget = CreateWidget<UDdTitleScreenWidget>(this, TitleWidgetClass);
 	if (TitleScreenWidget == nullptr)
 	{
 		return;
@@ -125,7 +125,7 @@ void ATitlePlayerController::EnterGame()
 		return;
 	}
 
-	const UTitleScreenSettings* Settings = GetDefault<UTitleScreenSettings>();
+	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (Settings == nullptr || Settings->GameLevelName.IsNone() || GetWorld() == nullptr)
 	{
 		return;

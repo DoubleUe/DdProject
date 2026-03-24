@@ -2,21 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
-#include "TitleScreenSettings.generated.h"
+#include "DdTitleScreenSettings.generated.h"
 
 UCLASS(Config=Game, DefaultConfig, meta=(DisplayName="Title Screen Settings"))
-class DDPROJECT_API UTitleScreenSettings : public UDeveloperSettings
+class DDPROJECT_API UDdTitleScreenSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 
 public:
-	UTitleScreenSettings();
+	UDdTitleScreenSettings();
 
 	UPROPERTY(Config, EditAnywhere, Category="Title Screen")
-	TSoftClassPtr<class UTitleScreenWidget> TitleScreenWidgetClass;
+	TSoftClassPtr<class UDdTitleScreenWidget> TitleScreenWidgetClass;
 
 	UPROPERTY(Config, EditAnywhere, Category="Title Screen")
-	TSoftClassPtr<class UScreenFadeWidget> ScreenFadeWidgetClass;
+	TSoftClassPtr<class UDdScreenFadeWidget> ScreenFadeWidgetClass;
 
 	UPROPERTY(Config, EditAnywhere, Category="Title Screen")
 	FName TitleLevelName;

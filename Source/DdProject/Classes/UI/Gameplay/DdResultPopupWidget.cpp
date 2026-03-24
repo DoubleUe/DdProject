@@ -1,4 +1,4 @@
-#include "ResultPopupWidget.h"
+#include "DdResultPopupWidget.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Button.h"
@@ -8,30 +8,30 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-void UResultPopupWidget::ShowPopup()
+void UDdResultPopupWidget::ShowPopup()
 {
 	SetVisibility(ESlateVisibility::Visible);
 	SetIsEnabled(true);
 }
 
-void UResultPopupWidget::HidePopup()
+void UDdResultPopupWidget::HidePopup()
 {
 	SetIsEnabled(false);
 	SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UResultPopupWidget::NativeOnInitialized()
+void UDdResultPopupWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
 	if (ConfirmButton != nullptr)
 	{
 		ConfirmButton->OnClicked.RemoveAll(this);
-		ConfirmButton->OnClicked.AddDynamic(this, &UResultPopupWidget::HandleConfirmButtonClicked);
+		ConfirmButton->OnClicked.AddDynamic(this, &UDdResultPopupWidget::HandleConfirmButtonClicked);
 	}
 }
 
-void UResultPopupWidget::NativeConstruct()
+void UDdResultPopupWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -41,19 +41,19 @@ void UResultPopupWidget::NativeConstruct()
 	if (ConfirmButton != nullptr)
 	{
 		ConfirmButton->OnClicked.RemoveAll(this);
-		ConfirmButton->OnClicked.AddDynamic(this, &UResultPopupWidget::HandleConfirmButtonClicked);
+		ConfirmButton->OnClicked.AddDynamic(this, &UDdResultPopupWidget::HandleConfirmButtonClicked);
 	}
 
 	HidePopup();
 }
 
-void UResultPopupWidget::HandleConfirmButtonClicked()
+void UDdResultPopupWidget::HandleConfirmButtonClicked()
 {
 	HidePopup();
 	OnClosed.Broadcast();
 }
 
-void UResultPopupWidget::EnsureWidgetTree()
+void UDdResultPopupWidget::EnsureWidgetTree()
 {
 	if (WidgetTree == nullptr)
 	{
@@ -122,7 +122,7 @@ void UResultPopupWidget::EnsureWidgetTree()
 	}
 }
 
-void UResultPopupWidget::EnsureConfirmButtonContent()
+void UDdResultPopupWidget::EnsureConfirmButtonContent()
 {
 	if (ConfirmButton == nullptr)
 	{
