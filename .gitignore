@@ -60,3 +60,7 @@ Build/*/**
 # macOS Finder metadata
 .DS_Store
 **/.DS_Store
+
+# Claude Code 관련 파일
+.claude/
+CLAUDE.md
