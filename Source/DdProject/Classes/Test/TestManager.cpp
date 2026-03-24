@@ -41,7 +41,6 @@ ATestManager* ATestManager::FindOrCreate(UWorld* World)
 
 	if (World->WorldType == EWorldType::Editor)
 	{
-		SpawnParameters.bTemporaryEditorActor = true;
 		SpawnParameters.ObjectFlags |= RF_Transient;
 	}
 
@@ -92,7 +91,6 @@ AMonsterCharacter* ATestManager::SpawnZombie()
 
 	if (World->WorldType == EWorldType::Editor)
 	{
-		SpawnParameters.bTemporaryEditorActor = true;
 		SpawnParameters.ObjectFlags |= RF_Transient;
 	}
 

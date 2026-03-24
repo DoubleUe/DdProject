@@ -26,11 +26,7 @@ AMonsterCharacter::AMonsterCharacter()
 	CharacterMovementComponent->MaxWalkSpeed = 300.0f;
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 
-	static ConstructorHelpers::FClassFinder<AAIController> MonsterAiControllerClass(TEXT("/Game/Design/AI/Monster/BP_MonsterChaseAIController"));
-	if (MonsterAiControllerClass.Succeeded())
-	{
-		AIControllerClass = MonsterAiControllerClass.Class;
-	}
+	AIControllerClass = nullptr;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -96.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -53,9 +49,11 @@ AMonsterCharacter::AMonsterCharacter()
 	IdleRunBlendSpace = nullptr;
 	IdleAnimation = nullptr;
 	RunAnimation = nullptr;
+	AttackAnimation = nullptr;
 	CurrentLoopAnimation = nullptr;
 	PreviousAnimationLocation = FVector::ZeroVector;
 	bHasPreviousAnimationLocation = false;
+	bIsAttacking = false;
 }
 
 void AMonsterCharacter::BeginPlay()
@@ -97,12 +95,79 @@ void AMonsterCharacter::LoadAnimationAssets()
 	CurrentLoopAnimation = nullptr;
 }
 
+void AMonsterCharacter::PlayAttackAnimation()
+{
+	// 이미 공격 중이면 무시
+	if (bIsAttacking)
+	{
+		return;
+	}
+
+	if (AttackAnimation == nullptr)
+	{
+		return;
+	}
+
+	bIsAttacking = true;
+
+	USkeletalMeshComponent* MeshComponent = GetMesh();
+	if (MeshComponent == nullptr)
+	{
+		bIsAttacking = false;
+		return;
+	}
+
+	if (MeshComponent->GetAnimationMode() != EAnimationMode::AnimationSingleNode)
+	{
+		MeshComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		MeshComponent->InitAnim(true);
+	}
+
+	if (UAnimSingleNodeInstance* SingleNodeInstance = MeshComponent->GetSingleNodeInstance())
+	{
+		SingleNodeInstance->SetAnimationAsset(AttackAnimation, false, 1.0f);
+		SingleNodeInstance->SetPlaying(true);
+		SingleNodeInstance->SetLooping(false);
+		SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+	}
+
+	// 현재 루프 애니메이션 초기화 (공격 끝난 후 이동 애니메이션이 다시 설정되도록)
+	CurrentLoopAnimation = nullptr;
+}
+
+void AMonsterCharacter::OnAttackAnimationEnded()
+{
+	bIsAttacking = false;
+	CurrentLoopAnimation = nullptr;
+}
+
 void AMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 {
 	USkeletalMeshComponent* MeshComponent = GetMesh();
 	if (MeshComponent == nullptr)
 	{
 		return;
+	}
+
+	// 공격 애니메이션 재생 중에는 이동 애니메이션을 덮어쓰지 않음
+	if (bIsAttacking)
+	{
+		// 공격 애니메이션이 끝났는지 확인
+		if (UAnimSingleNodeInstance* SingleNodeInstance = MeshComponent->GetSingleNodeInstance())
+		{
+			if (!SingleNodeInstance->IsPlaying())
+			{
+				OnAttackAnimationEnded();
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			OnAttackAnimationEnded();
+		}
 	}
 
 	const auto EnsureSingleNodeInstance = [MeshComponent]() -> UAnimSingleNodeInstance*
