@@ -9,11 +9,11 @@
 #include "InputCoreTypes.h"
 #include "LevelEditor.h"
 #include "Modules/ModuleManager.h"
-#include "Test/TestManager.h"
+#include "Test/DdTestManager.h"
 #include "Commands/DdProjectEditorCommands.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "Widgets/STestToolsPanel.h"
+#include "Widgets/SDdTestToolsPanel.h"
 #include "WorkspaceMenuStructure.h"
 #include "WorkspaceMenuStructureModule.h"
 
@@ -160,14 +160,14 @@ void FDdProjectEditorModule::SpawnZombieFromTools()
 		return;
 	}
 
-	ATestManager* TestManager = ATestManager::FindOrCreate(World);
-	if (TestManager == nullptr)
+	ADdTestManager* DdTestManager = ADdTestManager::FindOrCreate(World);
+	if (DdTestManager == nullptr)
 	{
-		ShowNotification(LOCTEXT("NoTestManager", "Failed to find or create TestManager."));
+		ShowNotification(LOCTEXT("NoDdTestManager", "Failed to find or create DdTestManager."));
 		return;
 	}
 
-	AMonsterCharacter* SpawnedZombie = TestManager->SpawnZombie();
+	ADdMonsterCharacter* SpawnedZombie = DdTestManager->SpawnZombie();
 	if (SpawnedZombie == nullptr)
 	{
 		ShowNotification(LOCTEXT("SpawnZombieFailed", "Failed to spawn a zombie. Make sure a player character exists in the current world."));
@@ -189,7 +189,7 @@ TSharedRef<SDockTab> FDdProjectEditorModule::SpawnTestToolsTab(const FSpawnTabAr
 		.TabRole(ETabRole::NomadTab)
 		.Label(LOCTEXT("TestToolsTabLabel", "Zombie Spawn Tools"))
 		[
-			SNew(STestToolsPanel)
+			SNew(SDdTestToolsPanel)
 			.OnSpawnZombie(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieFromTools))
 		];
 }
