@@ -26,7 +26,7 @@ AMonsterCharacter::AMonsterCharacter()
 	CharacterMovementComponent->MaxWalkSpeed = 300.0f;
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 
-	static ConstructorHelpers::FClassFinder<AAIController> ZombieAiControllerClass(TEXT("/Game/Characters/Zombie/AI/BP_ZombieChaseAIController"));
+	static ConstructorHelpers::FClassFinder<AAIController> ZombieAiControllerClass(TEXT("/Game/Design/AI/Monster/BP_ZombieChaseAIController"));
 	if (ZombieAiControllerClass.Succeeded())
 	{
 		AIControllerClass = ZombieAiControllerClass.Class;
