@@ -2,12 +2,11 @@
 
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimSequenceBase.h"
-#include "Camera/CameraComponent.h"
+#include "Component/PlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "TimerManager.h"
@@ -33,18 +32,8 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 	CharacterMovementComponent->BrakingDecelerationFalling = 1500.0f;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f;
-	CameraBoom->bUsePawnControlRotation = true;
-	MinCameraBoomLength = GetCapsuleComponent()->GetUnscaledCapsuleRadius() * 2.0f;
-	MaxCameraBoomLength = CameraBoom->TargetArmLength * 2.0f;
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength, MinCameraBoomLength, MaxCameraBoomLength);
-	DesiredCameraBoomLength = CameraBoom->TargetArmLength;
-
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	// 카메라 컴포넌트 생성
+	PlayerCameraComp = CreateDefaultSubobject<UPlayerCameraComponent>(TEXT("PlayerCameraComp"));
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
 
@@ -102,10 +91,6 @@ void APlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	DesiredCameraBoomLength = CameraBoom != nullptr ? CameraBoom->TargetArmLength : DesiredCameraBoomLength;
-	bCameraZoomBoundsDirty = true;
-	UpdateCameraZoom(0.0f);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -153,7 +138,10 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UpdateCameraZoom(DeltaSeconds);
+	if (PlayerCameraComp != nullptr)
+	{
+		PlayerCameraComp->UpdateCameraZoom(DeltaSeconds);
+	}
 }
 
 void APlayerCharacter::MoveForward(float Value)
@@ -204,13 +192,10 @@ void APlayerCharacter::LookUp(float Value)
 
 void APlayerCharacter::ZoomCamera(float Value)
 {
-	if (FMath::IsNearlyZero(Value) || CameraBoom == nullptr)
+	if (PlayerCameraComp != nullptr)
 	{
-		return;
+		PlayerCameraComp->ZoomCamera(Value);
 	}
-
-	DesiredCameraBoomLength -= Value * CameraZoomStep;
-	bCameraZoomBoundsDirty = true;
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
@@ -288,56 +273,4 @@ void APlayerCharacter::FinishAttackAnimation()
 bool APlayerCharacter::CanProcessMovementInput() const
 {
 	return !bAttackAnimationPlaying || !bAttackMovementInputBlocked;
-}
-
-void APlayerCharacter::UpdateCameraZoom(float DeltaSeconds)
-{
-	if (CameraBoom == nullptr)
-	{
-		return;
-	}
-
-	const float CapsuleZoomLimit = FMath::Max(0.0f, GetCapsuleComponent()->GetScaledCapsuleRadius() * 4.0f);
-	if (!FMath::IsNearlyEqual(CachedCapsuleZoomLimit, CapsuleZoomLimit))
-	{
-		CachedCapsuleZoomLimit = CapsuleZoomLimit;
-		bCameraZoomBoundsDirty = true;
-	}
-
-	if (bCameraZoomBoundsDirty)
-	{
-		RefreshCameraZoomBounds();
-		bCameraZoomBoundsDirty = false;
-	}
-
-	if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, DesiredCameraBoomLength))
-	{
-		return;
-	}
-
-	const float NewArmLength = FMath::FInterpTo(
-		CameraBoom->TargetArmLength,
-		DesiredCameraBoomLength,
-		DeltaSeconds,
-		CameraZoomInterpSpeed);
-
-	CameraBoom->TargetArmLength = FMath::IsNearlyEqual(NewArmLength, DesiredCameraBoomLength)
-		? DesiredCameraBoomLength
-		: NewArmLength;
-}
-
-void APlayerCharacter::RefreshCameraZoomBounds()
-{
-	if (CameraBoom == nullptr)
-	{
-		return;
-	}
-
-	const float CapsuleZoomLimit = CachedCapsuleZoomLimit >= 0.0f
-		? CachedCapsuleZoomLimit
-		: FMath::Max(0.0f, GetCapsuleComponent()->GetScaledCapsuleRadius() * 4.0f);
-	MinCameraBoomLength = FMath::Max(0.0f, CapsuleZoomLimit);
-	MaxCameraBoomLength = FMath::Max(MinCameraBoomLength, MaxCameraBoomLength);
-	DesiredCameraBoomLength = FMath::Clamp(DesiredCameraBoomLength, MinCameraBoomLength, MaxCameraBoomLength);
-	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength, MinCameraBoomLength, MaxCameraBoomLength);
 }

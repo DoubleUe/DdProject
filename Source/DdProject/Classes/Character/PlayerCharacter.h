@@ -5,11 +5,10 @@
 #include "TimerManager.h"
 #include "PlayerCharacter.generated.h"
 
-class UCameraComponent;
 class UClass;
 class UAnimSequenceBase;
 class UInputAction;
-class USpringArmComponent;
+class UPlayerCameraComponent;
 struct FInputActionValue;
 
 UCLASS()
@@ -39,35 +38,9 @@ private:
 	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();
 	bool CanProcessMovementInput() const;
-	void UpdateCameraZoom(float DeltaSeconds);
-	void RefreshCameraZoomBounds();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<USpringArmComponent> CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UCameraComponent> FollowCamera;
-
-	UPROPERTY(EditDefaultsOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	float CameraZoomStep = 50.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Camera", meta=(AllowPrivateAccess="true", ClampMin="0.1"))
-	float CameraZoomInterpSpeed = 10.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	float MinCameraBoomLength = 0.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	float MaxCameraBoomLength = 0.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta=(AllowPrivateAccess="true"))
-	float DesiredCameraBoomLength = 0.0f;
-
-	UPROPERTY()
-	bool bCameraZoomBoundsDirty = true;
-
-	UPROPERTY()
-	float CachedCapsuleZoomLimit = -1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPlayerCameraComponent> PlayerCameraComp;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInputAction> JumpAction;

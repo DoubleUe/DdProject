@@ -3,7 +3,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameLevelGameMode.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class DDPROJECT_API AGameLevelGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
