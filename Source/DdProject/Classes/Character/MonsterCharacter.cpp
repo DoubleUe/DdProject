@@ -26,27 +26,27 @@ AMonsterCharacter::AMonsterCharacter()
 	CharacterMovementComponent->MaxWalkSpeed = 300.0f;
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 
-	static ConstructorHelpers::FClassFinder<AAIController> ZombieAiControllerClass(TEXT("/Game/Design/AI/Monster/BP_ZombieChaseAIController"));
-	if (ZombieAiControllerClass.Succeeded())
+	static ConstructorHelpers::FClassFinder<AAIController> MonsterAiControllerClass(TEXT("/Game/Design/AI/Monster/BP_MonsterChaseAIController"));
+	if (MonsterAiControllerClass.Succeeded())
 	{
-		AIControllerClass = ZombieAiControllerClass.Class;
+		AIControllerClass = MonsterAiControllerClass.Class;
 	}
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -96.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> ZombieMeshAsset(TEXT("/Game/Characters/Zombie/Mesh/Zombie_Running.Zombie_Running"));
-	static ConstructorHelpers::FObjectFinder<USkeleton> ZombieSkeletonAsset(TEXT("/Game/Characters/Zombie/Mesh/Zombie_Running_Skeleton.Zombie_Running_Skeleton"));
-	if (ZombieMeshAsset.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MonsterMeshAsset(TEXT("/Game/Characters/Zombie/Mesh/Zombie_Running.Zombie_Running"));
+	static ConstructorHelpers::FObjectFinder<USkeleton> MonsterSkeletonAsset(TEXT("/Game/Characters/Zombie/Mesh/Zombie_Running_Skeleton.Zombie_Running_Skeleton"));
+	if (MonsterMeshAsset.Succeeded())
 	{
-		USkeletalMesh* ZombieMesh = ZombieMeshAsset.Object;
-		if (ZombieSkeletonAsset.Succeeded() && ZombieMesh->GetSkeleton() == ZombieSkeletonAsset.Object)
+		USkeletalMesh* MonsterMesh = MonsterMeshAsset.Object;
+		if (MonsterSkeletonAsset.Succeeded() && MonsterMesh->GetSkeleton() == MonsterSkeletonAsset.Object)
 		{
-			GetMesh()->SetSkeletalMesh(ZombieMesh);
+			GetMesh()->SetSkeletalMesh(MonsterMesh);
 		}
 		else
 		{
-			GetMesh()->SetSkeletalMesh(ZombieMesh);
+			GetMesh()->SetSkeletalMesh(MonsterMesh);
 		}
 	}
 
