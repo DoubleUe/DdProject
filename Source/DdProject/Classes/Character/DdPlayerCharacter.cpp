@@ -1,4 +1,4 @@
-#include "PlayerCharacter.h"
+#include "DdPlayerCharacter.h"
 
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimSequenceBase.h"
@@ -12,7 +12,7 @@
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 
-APlayerCharacter::APlayerCharacter()
+ADdPlayerCharacter::ADdPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -82,27 +82,27 @@ APlayerCharacter::APlayerCharacter()
 	}
 }
 
-void APlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
+void ADdPlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 {
 	bAttackMovementInputBlocked = bBlocked;
 	bCanTransitionFromAttackToMovement = !bBlocked;
 }
 
-void APlayerCharacter::BeginPlay()
+void ADdPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &APlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &APlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APlayerCharacter::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APlayerCharacter::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &APlayerCharacter::ZoomCamera);
-	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &APlayerCharacter::Attack);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ADdPlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ADdPlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ADdPlayerCharacter::Turn);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ADdPlayerCharacter::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &ADdPlayerCharacter::ZoomCamera);
+	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &ADdPlayerCharacter::Attack);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
 
@@ -120,21 +120,21 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (MoveAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Move);
 	}
 
 	if (LookAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
 	}
 
 	if (MouseLookAction != nullptr)
 	{
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
 	}
 }
 
-void APlayerCharacter::Tick(float DeltaSeconds)
+void ADdPlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -144,7 +144,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-void APlayerCharacter::MoveForward(float Value)
+void ADdPlayerCharacter::MoveForward(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
@@ -159,7 +159,7 @@ void APlayerCharacter::MoveForward(float Value)
 	AddMovementInput(ForwardDirection, Value);
 }
 
-void APlayerCharacter::MoveRight(float Value)
+void ADdPlayerCharacter::MoveRight(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
@@ -174,7 +174,7 @@ void APlayerCharacter::MoveRight(float Value)
 	AddMovementInput(RightDirection, Value);
 }
 
-void APlayerCharacter::Turn(float Value)
+void ADdPlayerCharacter::Turn(float Value)
 {
 	if (!FMath::IsNearlyZero(Value))
 	{
@@ -182,7 +182,7 @@ void APlayerCharacter::Turn(float Value)
 	}
 }
 
-void APlayerCharacter::LookUp(float Value)
+void ADdPlayerCharacter::LookUp(float Value)
 {
 	if (!FMath::IsNearlyZero(Value))
 	{
@@ -190,7 +190,7 @@ void APlayerCharacter::LookUp(float Value)
 	}
 }
 
-void APlayerCharacter::ZoomCamera(float Value)
+void ADdPlayerCharacter::ZoomCamera(float Value)
 {
 	if (PlayerCameraComp != nullptr)
 	{
@@ -198,21 +198,21 @@ void APlayerCharacter::ZoomCamera(float Value)
 	}
 }
 
-void APlayerCharacter::Move(const FInputActionValue& Value)
+void ADdPlayerCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	MoveForward(MovementVector.Y);
 	MoveRight(MovementVector.X);
 }
 
-void APlayerCharacter::Look(const FInputActionValue& Value)
+void ADdPlayerCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	Turn(LookAxisVector.X);
 	LookUp(LookAxisVector.Y);
 }
 
-void APlayerCharacter::Attack()
+void ADdPlayerCharacter::Attack()
 {
 	if (bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
 	{
@@ -233,12 +233,12 @@ void APlayerCharacter::Attack()
 	GetWorldTimerManager().SetTimer(
 		AttackAnimationTimerHandle,
 		this,
-		&APlayerCharacter::FinishAttackAnimation,
+		&ADdPlayerCharacter::FinishAttackAnimation,
 		AttackDuration,
 		false);
 }
 
-void APlayerCharacter::RestoreAnimationBlueprint()
+void ADdPlayerCharacter::RestoreAnimationBlueprint()
 {
 	if (GetMesh() == nullptr || CharacterAnimBlueprintClass == nullptr)
 	{
@@ -249,7 +249,7 @@ void APlayerCharacter::RestoreAnimationBlueprint()
 	GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
 }
 
-void APlayerCharacter::TryBlendToMovementAnimation()
+void ADdPlayerCharacter::TryBlendToMovementAnimation()
 {
 	if (!bAttackAnimationPlaying || bAttackMovementInputBlocked || !bCanTransitionFromAttackToMovement)
 	{
@@ -262,7 +262,7 @@ void APlayerCharacter::TryBlendToMovementAnimation()
 	RestoreAnimationBlueprint();
 }
 
-void APlayerCharacter::FinishAttackAnimation()
+void ADdPlayerCharacter::FinishAttackAnimation()
 {
 	bAttackAnimationPlaying = false;
 	bAttackMovementInputBlocked = false;
@@ -270,7 +270,7 @@ void APlayerCharacter::FinishAttackAnimation()
 	RestoreAnimationBlueprint();
 }
 
-bool APlayerCharacter::CanProcessMovementInput() const
+bool ADdPlayerCharacter::CanProcessMovementInput() const
 {
 	return !bAttackAnimationPlaying || !bAttackMovementInputBlocked;
 }

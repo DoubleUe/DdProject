@@ -1,7 +1,7 @@
 #include "BTTask_MonsterAttack.h"
 
 #include "AIController.h"
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 
 UBTTask_MonsterAttack::UBTTask_MonsterAttack()
 {
@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(AIController->GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(AIController->GetPawn());
 	if (Monster == nullptr)
 	{
 		return EBTNodeResult::Failed;
@@ -39,7 +39,7 @@ void UBTTask_MonsterAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		return;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(AIController->GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(AIController->GetPawn());
 	if (Monster == nullptr)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);

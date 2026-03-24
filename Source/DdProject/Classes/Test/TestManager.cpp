@@ -1,6 +1,6 @@
 #include "TestManager.h"
 
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -12,14 +12,14 @@ ATestManager::ATestManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	static ConstructorHelpers::FClassFinder<AMonsterCharacter> ZombieBlueprintClass(TEXT("/Game/Characters/Zombie/BP_ZombieMonsterCharacter"));
+	static ConstructorHelpers::FClassFinder<ADdMonsterCharacter> ZombieBlueprintClass(TEXT("/Game/Characters/Zombie/BP_ZombieMonsterCharacter"));
 	if (ZombieBlueprintClass.Succeeded())
 	{
 		ZombieClass = ZombieBlueprintClass.Class;
 	}
 	else
 	{
-		ZombieClass = AMonsterCharacter::StaticClass();
+		ZombieClass = ADdMonsterCharacter::StaticClass();
 	}
 }
 
@@ -70,7 +70,7 @@ void ATestManager::BeginPlay()
 	}
 }
 
-AMonsterCharacter* ATestManager::SpawnZombie()
+ADdMonsterCharacter* ATestManager::SpawnZombie()
 {
 	UWorld* World = GetWorld();
 	if (World == nullptr || ZombieClass == nullptr)
@@ -94,7 +94,7 @@ AMonsterCharacter* ATestManager::SpawnZombie()
 		SpawnParameters.ObjectFlags |= RF_Transient;
 	}
 
-	AMonsterCharacter* SpawnedZombie = World->SpawnActor<AMonsterCharacter>(
+	ADdMonsterCharacter* SpawnedZombie = World->SpawnActor<ADdMonsterCharacter>(
 		ZombieClass,
 		SpawnLocation,
 		SpawnRotation,

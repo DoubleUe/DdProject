@@ -1,6 +1,6 @@
 #include "MovementInputNotifyState.h"
 
-#include "../../Character/PlayerCharacter.h"
+#include "../../Character/DdPlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 
 FString UMovementInputNotifyState::GetNotifyName_Implementation() const
@@ -17,7 +17,7 @@ void UMovementInputNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 		return;
 	}
 
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
+	ADdPlayerCharacter* PlayerCharacter = Cast<ADdPlayerCharacter>(MeshComp->GetOwner());
 	if (PlayerCharacter == nullptr)
 	{
 		return;
@@ -35,7 +35,7 @@ void UMovementInputNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAni
 		return;
 	}
 
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
+	ADdPlayerCharacter* PlayerCharacter = Cast<ADdPlayerCharacter>(MeshComp->GetOwner());
 	if (PlayerCharacter == nullptr)
 	{
 		return;

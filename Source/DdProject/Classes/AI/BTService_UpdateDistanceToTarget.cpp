@@ -1,7 +1,7 @@
 #include "BTService_UpdateDistanceToTarget.h"
 
 #include "AIController.h"
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 
 UBTService_UpdateDistanceToTarget::UBTService_UpdateDistanceToTarget()
 {
@@ -20,7 +20,7 @@ void UBTService_UpdateDistanceToTarget::TickNode(UBehaviorTreeComponent& OwnerCo
 		return;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(AIController->GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(AIController->GetPawn());
 	if (Monster == nullptr)
 	{
 		return;

@@ -1,4 +1,4 @@
-#include "MonsterCharacter.h"
+#include "DdMonsterCharacter.h"
 
 #include "AIController.h"
 #include "Animation/AnimationAsset.h"
@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
-AMonsterCharacter::AMonsterCharacter()
+ADdMonsterCharacter::ADdMonsterCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -56,7 +56,7 @@ AMonsterCharacter::AMonsterCharacter()
 	bIsAttacking = false;
 }
 
-void AMonsterCharacter::BeginPlay()
+void ADdMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -64,14 +64,14 @@ void AMonsterCharacter::BeginPlay()
 	UpdateMovementAnimation(0.0f);
 }
 
-void AMonsterCharacter::Tick(float DeltaSeconds)
+void ADdMonsterCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
 	UpdateMovementAnimation(DeltaSeconds);
 }
 
-void AMonsterCharacter::LoadAnimationAssets()
+void ADdMonsterCharacter::LoadAnimationAssets()
 {
 	IdleRunBlendSpace = LoadObject<UBlendSpace1D>(nullptr, TEXT("/Game/Characters/Zombie/Animation/Zombie_IdleRun_1D.Zombie_IdleRun_1D"));
 	IdleAnimation = LoadObject<UAnimationAsset>(nullptr, TEXT("/Game/Characters/Zombie/Animation/Zombie_Idle.Zombie_Idle"));
@@ -95,7 +95,7 @@ void AMonsterCharacter::LoadAnimationAssets()
 	CurrentLoopAnimation = nullptr;
 }
 
-void AMonsterCharacter::PlayAttackAnimation()
+void ADdMonsterCharacter::PlayAttackAnimation()
 {
 	// 이미 공격 중이면 무시
 	if (bIsAttacking)
@@ -135,13 +135,13 @@ void AMonsterCharacter::PlayAttackAnimation()
 	CurrentLoopAnimation = nullptr;
 }
 
-void AMonsterCharacter::OnAttackAnimationEnded()
+void ADdMonsterCharacter::OnAttackAnimationEnded()
 {
 	bIsAttacking = false;
 	CurrentLoopAnimation = nullptr;
 }
 
-void AMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
+void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 {
 	USkeletalMeshComponent* MeshComponent = GetMesh();
 	if (MeshComponent == nullptr)

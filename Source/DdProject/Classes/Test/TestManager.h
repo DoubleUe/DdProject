@@ -5,7 +5,7 @@
 #include "TestManager.generated.h"
 
 class ACharacter;
-class AMonsterCharacter;
+class ADdMonsterCharacter;
 class UWorld;
 
 UCLASS()
@@ -23,7 +23,7 @@ public:
 	static ATestManager* FindOrCreate(UWorld* World);
 
 	UPROPERTY(EditAnywhere, Category = "Test")
-	TSubclassOf<AMonsterCharacter> ZombieClass;
+	TSubclassOf<ADdMonsterCharacter> ZombieClass;
 
 	UPROPERTY(EditAnywhere, Category = "Test")
 	float SpawnRadius = 1000.0f;
@@ -32,7 +32,7 @@ public:
 	bool bSpawnZombieOnBeginPlay = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Test")
-	AMonsterCharacter* SpawnZombie();
+	ADdMonsterCharacter* SpawnZombie();
 
 private:
 	ACharacter* FindTargetCharacter() const;

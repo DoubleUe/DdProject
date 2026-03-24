@@ -1,7 +1,7 @@
 #include "MonsterAIController.h"
 
 #include "BehaviorTree/BehaviorTree.h"
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "GameFramework/Character.h"
@@ -51,7 +51,7 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 		return;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(GetPawn());
 	if (Monster == nullptr)
 	{
 		return;

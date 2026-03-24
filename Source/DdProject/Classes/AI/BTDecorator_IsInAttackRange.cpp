@@ -1,7 +1,7 @@
 #include "BTDecorator_IsInAttackRange.h"
 
 #include "AIController.h"
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
 {
@@ -16,7 +16,7 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 		return false;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(AIController->GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(AIController->GetPawn());
 	if (Monster == nullptr)
 	{
 		return false;

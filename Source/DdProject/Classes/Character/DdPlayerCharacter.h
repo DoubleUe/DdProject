@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TimerManager.h"
-#include "PlayerCharacter.generated.h"
+#include "DdPlayerCharacter.generated.h"
 
 class UClass;
 class UAnimSequenceBase;
@@ -12,12 +12,12 @@ class UPlayerCameraComponent;
 struct FInputActionValue;
 
 UCLASS()
-class DDPROJECT_API APlayerCharacter : public ACharacter
+class DDPROJECT_API ADdPlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	APlayerCharacter();
+	ADdPlayerCharacter();
 	void SetAttackMovementInputBlocked(bool bBlocked);
 
 protected:

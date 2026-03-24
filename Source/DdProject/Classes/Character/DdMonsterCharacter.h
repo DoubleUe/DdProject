@@ -4,15 +4,15 @@
 #include "Animation/AnimationAsset.h"
 #include "Animation/BlendSpace1D.h"
 #include "GameFramework/Character.h"
-#include "MonsterCharacter.generated.h"
+#include "DdMonsterCharacter.generated.h"
 
 UCLASS()
-class DDPROJECT_API AMonsterCharacter : public ACharacter
+class DDPROJECT_API ADdMonsterCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AMonsterCharacter();
+	ADdMonsterCharacter();
 
 	// 공격 애니메이션 재생 (AI 컨트롤러에서 호출)
 	UFUNCTION(BlueprintCallable, Category = "Combat")

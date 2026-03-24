@@ -167,7 +167,7 @@ void FDdProjectEditorModule::SpawnZombieFromTools()
 		return;
 	}
 
-	AMonsterCharacter* SpawnedZombie = TestManager->SpawnZombie();
+	ADdMonsterCharacter* SpawnedZombie = TestManager->SpawnZombie();
 	if (SpawnedZombie == nullptr)
 	{
 		ShowNotification(LOCTEXT("SpawnZombieFailed", "Failed to spawn a zombie. Make sure a player character exists in the current world."));

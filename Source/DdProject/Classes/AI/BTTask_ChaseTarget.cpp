@@ -1,7 +1,7 @@
 #include "BTTask_ChaseTarget.h"
 
 #include "AIController.h"
-#include "Character/MonsterCharacter.h"
+#include "Character/DdMonsterCharacter.h"
 #include "Navigation/PathFollowingComponent.h"
 
 UBTTask_ChaseTarget::UBTTask_ChaseTarget()
@@ -18,7 +18,7 @@ EBTNodeResult::Type UBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
-	AMonsterCharacter* Monster = Cast<AMonsterCharacter>(AIController->GetPawn());
+	ADdMonsterCharacter* Monster = Cast<ADdMonsterCharacter>(AIController->GetPawn());
 	if (Monster == nullptr)
 	{
 		return EBTNodeResult::Failed;
