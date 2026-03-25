@@ -1,4 +1,4 @@
-#include "GameplayPlayerController.h"
+#include "DdGameplayPlayerController.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
@@ -11,7 +11,7 @@
 #include "../UI/Title/DdScreenFadeWidget.h"
 #include "../UI/Title/DdTitleScreenSettings.h"
 
-AGameplayPlayerController::AGameplayPlayerController()
+ADdGameplayPlayerController::ADdGameplayPlayerController()
 {
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextAsset(TEXT("/Game/Characters/Player/Input/IMC_Default.IMC_Default"));
 	if (DefaultMappingContextAsset.Succeeded())
@@ -26,7 +26,7 @@ AGameplayPlayerController::AGameplayPlayerController()
 	}
 }
 
-void AGameplayPlayerController::BeginPlay()
+void ADdGameplayPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -42,28 +42,28 @@ void AGameplayPlayerController::BeginPlay()
 	ConfigureGameplayInput();
 }
 
-void AGameplayPlayerController::SetupInputComponent()
+void ADdGameplayPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
 	if (InputComponent != nullptr)
 	{
-		InputComponent->BindKey(EKeys::LeftBracket, IE_Pressed, this, &AGameplayPlayerController::ToggleResultPopup);
-		InputComponent->BindKey(EKeys::LeftAlt, IE_Pressed, this, &AGameplayPlayerController::BeginTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::LeftAlt, IE_Released, this, &AGameplayPlayerController::EndTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::RightAlt, IE_Pressed, this, &AGameplayPlayerController::BeginTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::RightAlt, IE_Released, this, &AGameplayPlayerController::EndTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::LeftBracket, IE_Pressed, this, &ADdGameplayPlayerController::ToggleResultPopup);
+		InputComponent->BindKey(EKeys::LeftAlt, IE_Pressed, this, &ADdGameplayPlayerController::BeginTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::LeftAlt, IE_Released, this, &ADdGameplayPlayerController::EndTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::RightAlt, IE_Pressed, this, &ADdGameplayPlayerController::BeginTemporaryCursorMode);
+		InputComponent->BindKey(EKeys::RightAlt, IE_Released, this, &ADdGameplayPlayerController::EndTemporaryCursorMode);
 	}
 }
 
-void AGameplayPlayerController::ConfigureGameplayInput()
+void ADdGameplayPlayerController::ConfigureGameplayInput()
 {
 	bTemporaryCursorModeActive = false;
 	RefreshInputMode();
 	RegisterGameplayMappingContexts();
 }
 
-void AGameplayPlayerController::RefreshInputMode()
+void ADdGameplayPlayerController::RefreshInputMode()
 {
 	if (IsResultPopupOpen())
 	{
@@ -98,7 +98,7 @@ void AGameplayPlayerController::RefreshInputMode()
 	bEnableMouseOverEvents = false;
 }
 
-void AGameplayPlayerController::RegisterGameplayMappingContexts()
+void ADdGameplayPlayerController::RegisterGameplayMappingContexts()
 {
 	if (!IsLocalPlayerController())
 	{
@@ -124,7 +124,7 @@ void AGameplayPlayerController::RegisterGameplayMappingContexts()
 	}
 }
 
-void AGameplayPlayerController::EnsureScreenFadeWidget()
+void ADdGameplayPlayerController::EnsureScreenFadeWidget()
 {
 	if (ScreenFadeWidget == nullptr)
 	{
@@ -161,7 +161,7 @@ void AGameplayPlayerController::EnsureScreenFadeWidget()
 	}
 }
 
-void AGameplayPlayerController::EnsureResultPopupWidget()
+void ADdGameplayPlayerController::EnsureResultPopupWidget()
 {
 	if (ResultPopupWidget != nullptr)
 	{
@@ -182,12 +182,12 @@ void AGameplayPlayerController::EnsureResultPopupWidget()
 	}
 
 	ResultPopupWidget->OnClosed.RemoveAll(this);
-	ResultPopupWidget->OnClosed.AddUObject(this, &AGameplayPlayerController::HandleResultPopupClosed);
+	ResultPopupWidget->OnClosed.AddUObject(this, &ADdGameplayPlayerController::HandleResultPopupClosed);
 	ResultPopupWidget->AddToViewport(200);
 	ResultPopupWidget->HidePopup();
 }
 
-void AGameplayPlayerController::ToggleResultPopup()
+void ADdGameplayPlayerController::ToggleResultPopup()
 {
 	EnsureResultPopupWidget();
 	if (ResultPopupWidget == nullptr)
@@ -206,7 +206,7 @@ void AGameplayPlayerController::ToggleResultPopup()
 	RefreshInputMode();
 }
 
-void AGameplayPlayerController::CloseResultPopup()
+void ADdGameplayPlayerController::CloseResultPopup()
 {
 	if (ResultPopupWidget == nullptr)
 	{
@@ -217,12 +217,12 @@ void AGameplayPlayerController::CloseResultPopup()
 	HandleResultPopupClosed();
 }
 
-void AGameplayPlayerController::HandleResultPopupClosed()
+void ADdGameplayPlayerController::HandleResultPopupClosed()
 {
 	RefreshInputMode();
 }
 
-void AGameplayPlayerController::BeginTemporaryCursorMode()
+void ADdGameplayPlayerController::BeginTemporaryCursorMode()
 {
 	if (bTemporaryCursorModeActive)
 	{
@@ -233,7 +233,7 @@ void AGameplayPlayerController::BeginTemporaryCursorMode()
 	RefreshInputMode();
 }
 
-void AGameplayPlayerController::EndTemporaryCursorMode()
+void ADdGameplayPlayerController::EndTemporaryCursorMode()
 {
 	if (!bTemporaryCursorModeActive)
 	{
@@ -244,7 +244,7 @@ void AGameplayPlayerController::EndTemporaryCursorMode()
 	RefreshInputMode();
 }
 
-bool AGameplayPlayerController::IsResultPopupOpen() const
+bool ADdGameplayPlayerController::IsResultPopupOpen() const
 {
 	return ResultPopupWidget != nullptr
 		&& ResultPopupWidget->GetVisibility() == ESlateVisibility::Visible;

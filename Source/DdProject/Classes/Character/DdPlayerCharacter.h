@@ -8,7 +8,7 @@
 class UClass;
 class UAnimSequenceBase;
 class UInputAction;
-class UPlayerCameraComponent;
+class UDdPlayerCameraComponent;
 struct FInputActionValue;
 
 UCLASS()
@@ -40,7 +40,7 @@ private:
 	bool CanProcessMovementInput() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UPlayerCameraComponent> PlayerCameraComp;
+	TObjectPtr<UDdPlayerCameraComponent> PlayerCameraComp;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInputAction> JumpAction;

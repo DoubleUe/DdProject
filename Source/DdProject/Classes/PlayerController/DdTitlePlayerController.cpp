@@ -1,4 +1,4 @@
-#include "TitlePlayerController.h"
+#include "DdTitlePlayerController.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -6,7 +6,7 @@
 #include "../UI/Title/DdTitleScreenSettings.h"
 #include "../UI/Title/DdTitleScreenWidget.h"
 
-void ATitlePlayerController::BeginPlay()
+void ADdTitlePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -21,7 +21,7 @@ void ATitlePlayerController::BeginPlay()
 	ShowTitleScreen();
 }
 
-void ATitlePlayerController::ConfigureTitleInput()
+void ADdTitlePlayerController::ConfigureTitleInput()
 {
 	FInputModeUIOnly InputMode;
 	if (TitleScreenWidget != nullptr)
@@ -36,7 +36,7 @@ void ATitlePlayerController::ConfigureTitleInput()
 	bEnableMouseOverEvents = true;
 }
 
-void ATitlePlayerController::EnsureScreenFadeWidget()
+void ADdTitlePlayerController::EnsureScreenFadeWidget()
 {
 	if (ScreenFadeWidget == nullptr)
 	{
@@ -73,11 +73,11 @@ void ATitlePlayerController::EnsureScreenFadeWidget()
 	if (ScreenFadeWidget != nullptr)
 	{
 		ScreenFadeWidget->OnFadeFinished.RemoveAll(this);
-		ScreenFadeWidget->OnFadeFinished.AddUObject(this, &ATitlePlayerController::HandleScreenFadeFinished);
+		ScreenFadeWidget->OnFadeFinished.AddUObject(this, &ADdTitlePlayerController::HandleScreenFadeFinished);
 	}
 }
 
-void ATitlePlayerController::ShowTitleScreen()
+void ADdTitlePlayerController::ShowTitleScreen()
 {
 	if (!IsLocalController() || TitleScreenWidget != nullptr)
 	{
@@ -102,12 +102,12 @@ void ATitlePlayerController::ShowTitleScreen()
 		return;
 	}
 
-	TitleScreenWidget->OnStartGameRequested.AddUObject(this, &ATitlePlayerController::EnterGame);
+	TitleScreenWidget->OnStartGameRequested.AddUObject(this, &ADdTitlePlayerController::EnterGame);
 	TitleScreenWidget->AddToViewport(100);
 	ConfigureTitleInput();
 }
 
-void ATitlePlayerController::HandleScreenFadeFinished()
+void ADdTitlePlayerController::HandleScreenFadeFinished()
 {
 	if (!bOpenLevelWhenFadeCompletes)
 	{
@@ -115,10 +115,10 @@ void ATitlePlayerController::HandleScreenFadeFinished()
 	}
 
 	bOpenLevelWhenFadeCompletes = false;
-	GetWorldTimerManager().SetTimerForNextTick(this, &ATitlePlayerController::OpenPendingLevel);
+	GetWorldTimerManager().SetTimerForNextTick(this, &ADdTitlePlayerController::OpenPendingLevel);
 }
 
-void ATitlePlayerController::EnterGame()
+void ADdTitlePlayerController::EnterGame()
 {
 	if (bIsTransitioning)
 	{
@@ -157,7 +157,7 @@ void ATitlePlayerController::EnterGame()
 	OpenPendingLevel();
 }
 
-void ATitlePlayerController::OpenPendingLevel()
+void ADdTitlePlayerController::OpenPendingLevel()
 {
 	if (TitleScreenWidget != nullptr)
 	{

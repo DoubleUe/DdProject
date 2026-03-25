@@ -2,19 +2,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PlayerCameraComponent.generated.h"
+#include "DdPlayerCameraComponent.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
 
 // 플레이어 캐릭터의 카메라 붐 및 카메라를 관리하는 컴포넌트
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class DDPROJECT_API UPlayerCameraComponent : public UActorComponent
+class DDPROJECT_API UDdPlayerCameraComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UPlayerCameraComponent();
+	UDdPlayerCameraComponent();
 
 	// 줌 입력 처리
 	void ZoomCamera(float Value);

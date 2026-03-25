@@ -1,23 +1,23 @@
-#include "PlayerCameraComponent.h"
+#include "DdPlayerCameraComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 
-UPlayerCameraComponent::UPlayerCameraComponent()
+UDdPlayerCameraComponent::UDdPlayerCameraComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPlayerCameraComponent::OnRegister()
+void UDdPlayerCameraComponent::OnRegister()
 {
 	Super::OnRegister();
 
 	CreateCameraComponents();
 }
 
-void UPlayerCameraComponent::CreateCameraComponents()
+void UDdPlayerCameraComponent::CreateCameraComponents()
 {
 	AActor* Owner = GetOwner();
 	if (Owner == nullptr || CameraBoom != nullptr)
@@ -55,7 +55,7 @@ void UPlayerCameraComponent::CreateCameraComponents()
 	FollowCamera->RegisterComponent();
 }
 
-void UPlayerCameraComponent::ZoomCamera(float Value)
+void UDdPlayerCameraComponent::ZoomCamera(float Value)
 {
 	if (FMath::IsNearlyZero(Value) || CameraBoom == nullptr)
 	{
@@ -66,7 +66,7 @@ void UPlayerCameraComponent::ZoomCamera(float Value)
 	bCameraZoomBoundsDirty = true;
 }
 
-void UPlayerCameraComponent::UpdateCameraZoom(float DeltaSeconds)
+void UDdPlayerCameraComponent::UpdateCameraZoom(float DeltaSeconds)
 {
 	if (CameraBoom == nullptr)
 	{
@@ -107,7 +107,7 @@ void UPlayerCameraComponent::UpdateCameraZoom(float DeltaSeconds)
 		: NewArmLength;
 }
 
-void UPlayerCameraComponent::RefreshCameraZoomBounds()
+void UDdPlayerCameraComponent::RefreshCameraZoomBounds()
 {
 	if (CameraBoom == nullptr)
 	{

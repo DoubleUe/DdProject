@@ -1,11 +1,11 @@
-#include "GameLevelGameMode.h"
+#include "DdGameLevelGameMode.h"
 
-#include "../PlayerController/GameplayPlayerController.h"
+#include "../PlayerController/DdGameplayPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
-AGameLevelGameMode::AGameLevelGameMode()
+ADdGameLevelGameMode::ADdGameLevelGameMode()
 {
-	PlayerControllerClass = AGameplayPlayerController::StaticClass();
+	PlayerControllerClass = ADdGameplayPlayerController::StaticClass();
 
 	static ConstructorHelpers::FClassFinder<APawn> PlayerBPClass(TEXT("/Game/Characters/Player/BP_PlayerCharacter"));
 	if (PlayerBPClass.Succeeded())

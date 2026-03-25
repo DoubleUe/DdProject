@@ -2,7 +2,7 @@
 
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimSequenceBase.h"
-#include "Component/PlayerCameraComponent.h"
+#include "Component/DdPlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -33,7 +33,7 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 	CharacterMovementComponent->BrakingDecelerationFalling = 1500.0f;
 
 	// 카메라 컴포넌트 생성
-	PlayerCameraComp = CreateDefaultSubobject<UPlayerCameraComponent>(TEXT("PlayerCameraComp"));
+	PlayerCameraComp = CreateDefaultSubobject<UDdPlayerCameraComponent>(TEXT("PlayerCameraComp"));
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
 

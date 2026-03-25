@@ -1,10 +1,10 @@
 #pragma once
 
 #include "GameFramework/PlayerController.h"
-#include "TitlePlayerController.generated.h"
+#include "DdTitlePlayerController.generated.h"
 
 UCLASS()
-class DDPROJECT_API ATitlePlayerController : public APlayerController
+class DDPROJECT_API ADdTitlePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 

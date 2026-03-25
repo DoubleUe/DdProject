@@ -1,15 +1,15 @@
 #pragma once
 
 #include "GameFramework/PlayerController.h"
-#include "GameplayPlayerController.generated.h"
+#include "DdGameplayPlayerController.generated.h"
 
 UCLASS()
-class DDPROJECT_API AGameplayPlayerController : public APlayerController
+class DDPROJECT_API ADdGameplayPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	AGameplayPlayerController();
+	ADdGameplayPlayerController();
 
 protected:
 	virtual void BeginPlay() override;
