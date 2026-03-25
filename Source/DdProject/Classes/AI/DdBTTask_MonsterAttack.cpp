@@ -1,15 +1,15 @@
-#include "BTTask_MonsterAttack.h"
+#include "DdBTTask_MonsterAttack.h"
 
 #include "AIController.h"
 #include "Character/DdMonsterCharacter.h"
 
-UBTTask_MonsterAttack::UBTTask_MonsterAttack()
+UDdBTTask_MonsterAttack::UDdBTTask_MonsterAttack()
 {
 	NodeName = TEXT("몬스터 공격");
 	bNotifyTick = true;
 }
 
-EBTNodeResult::Type UBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UDdBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)
@@ -30,7 +30,7 @@ EBTNodeResult::Type UBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent& O
 	return EBTNodeResult::InProgress;
 }
 
-void UBTTask_MonsterAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UDdBTTask_MonsterAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)

@@ -1,4 +1,4 @@
-#include "TestManager.h"
+#include "DdTestManager.h"
 
 #include "Character/DdMonsterCharacter.h"
 #include "Engine/World.h"
@@ -8,7 +8,7 @@
 #include "NavigationSystem.h"
 #include "UObject/ConstructorHelpers.h"
 
-ATestManager::ATestManager()
+ADdTestManager::ADdTestManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -23,20 +23,20 @@ ATestManager::ATestManager()
 	}
 }
 
-ATestManager* ATestManager::FindOrCreate(UWorld* World)
+ADdTestManager* ADdTestManager::FindOrCreate(UWorld* World)
 {
 	if (World == nullptr)
 	{
 		return nullptr;
 	}
 
-	for (TActorIterator<ATestManager> It(World); It; ++It)
+	for (TActorIterator<ADdTestManager> It(World); It; ++It)
 	{
 		return *It;
 	}
 
 	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Name = TEXT("TestManager");
+	SpawnParameters.Name = TEXT("DdTestManager");
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	if (World->WorldType == EWorldType::Editor)
@@ -44,7 +44,7 @@ ATestManager* ATestManager::FindOrCreate(UWorld* World)
 		SpawnParameters.ObjectFlags |= RF_Transient;
 	}
 
-	ATestManager* SpawnedManager = World->SpawnActor<ATestManager>(
+	ADdTestManager* SpawnedManager = World->SpawnActor<ADdTestManager>(
 		StaticClass(),
 		FVector::ZeroVector,
 		FRotator::ZeroRotator,
@@ -53,14 +53,14 @@ ATestManager* ATestManager::FindOrCreate(UWorld* World)
 #if WITH_EDITOR
 	if (SpawnedManager != nullptr)
 	{
-		SpawnedManager->SetActorLabel(TEXT("TestManager"));
+		SpawnedManager->SetActorLabel(TEXT("DdTestManager"));
 	}
 #endif
 
 	return SpawnedManager;
 }
 
-void ATestManager::BeginPlay()
+void ADdTestManager::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -70,7 +70,7 @@ void ATestManager::BeginPlay()
 	}
 }
 
-ADdMonsterCharacter* ATestManager::SpawnZombie()
+ADdMonsterCharacter* ADdTestManager::SpawnZombie()
 {
 	UWorld* World = GetWorld();
 	if (World == nullptr || ZombieClass == nullptr)
@@ -108,13 +108,13 @@ ADdMonsterCharacter* ATestManager::SpawnZombie()
 	return SpawnedZombie;
 }
 
-ACharacter* ATestManager::FindTargetCharacter() const
+ACharacter* ADdTestManager::FindTargetCharacter() const
 {
 	UWorld* World = GetWorld();
 	return World != nullptr ? UGameplayStatics::GetPlayerCharacter(World, 0) : nullptr;
 }
 
-bool ATestManager::TryResolveZombieSpawn(FVector& OutSpawnLocation, FRotator& OutSpawnRotation) const
+bool ADdTestManager::TryResolveZombieSpawn(FVector& OutSpawnLocation, FRotator& OutSpawnRotation) const
 {
 	ACharacter* TargetCharacter = FindTargetCharacter();
 	if (!IsValid(TargetCharacter))

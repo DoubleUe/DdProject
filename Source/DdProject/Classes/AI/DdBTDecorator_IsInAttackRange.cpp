@@ -1,14 +1,14 @@
-#include "BTDecorator_IsInAttackRange.h"
+#include "DdBTDecorator_IsInAttackRange.h"
 
 #include "AIController.h"
 #include "Character/DdMonsterCharacter.h"
 
-UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
+UDdBTDecorator_IsInAttackRange::UDdBTDecorator_IsInAttackRange()
 {
 	NodeName = TEXT("공격 범위 확인");
 }
 
-bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UDdBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)

@@ -3,19 +3,19 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
-#include "MonsterAIController.generated.h"
+#include "DdMonsterAIController.generated.h"
 
 class UAIPerceptionComponent;
 class UAISenseConfig_Sight;
 class UBehaviorTree;
 
 UCLASS()
-class DDPROJECT_API AMonsterAIController : public AAIController
+class DDPROJECT_API ADdMonsterAIController : public AAIController
 {
 	GENERATED_BODY()
 
 public:
-	AMonsterAIController();
+	ADdMonsterAIController();
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;

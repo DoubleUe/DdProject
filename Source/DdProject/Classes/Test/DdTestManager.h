@@ -2,25 +2,25 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TestManager.generated.h"
+#include "DdTestManager.generated.h"
 
 class ACharacter;
 class ADdMonsterCharacter;
 class UWorld;
 
 UCLASS()
-class DDPROJECT_API ATestManager : public AActor
+class DDPROJECT_API ADdTestManager : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	ATestManager();
+	ADdTestManager();
 
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	static ATestManager* FindOrCreate(UWorld* World);
+	static ADdTestManager* FindOrCreate(UWorld* World);
 
 	UPROPERTY(EditAnywhere, Category = "Test")
 	TSubclassOf<ADdMonsterCharacter> ZombieClass;

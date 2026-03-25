@@ -1,4 +1,4 @@
-#include "MonsterAIController.h"
+#include "DdMonsterAIController.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "Character/DdMonsterCharacter.h"
@@ -6,7 +6,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "GameFramework/Character.h"
 
-AMonsterAIController::AMonsterAIController()
+ADdMonsterAIController::ADdMonsterAIController()
 {
 	// AIPerception 컴포넌트 생성
 	AIPerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComp"));
@@ -27,14 +27,14 @@ AMonsterAIController::AMonsterAIController()
 	AIPerceptionComp->SetDominantSense(UAISense_Sight::StaticClass());
 }
 
-void AMonsterAIController::OnPossess(APawn* InPawn)
+void ADdMonsterAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
 	// 개별 액터 감지/비감지 콜백 바인딩
 	if (AIPerceptionComp != nullptr)
 	{
-		AIPerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnTargetPerceptionUpdated);
+		AIPerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &ADdMonsterAIController::OnTargetPerceptionUpdated);
 	}
 
 	// 비헤이비어 트리 실행
@@ -44,7 +44,7 @@ void AMonsterAIController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+void ADdMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Actor == nullptr)
 	{

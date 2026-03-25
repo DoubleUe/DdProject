@@ -1,16 +1,16 @@
-#include "BTTask_ChaseTarget.h"
+#include "DdBTTask_ChaseTarget.h"
 
 #include "AIController.h"
 #include "Character/DdMonsterCharacter.h"
 #include "Navigation/PathFollowingComponent.h"
 
-UBTTask_ChaseTarget::UBTTask_ChaseTarget()
+UDdBTTask_ChaseTarget::UDdBTTask_ChaseTarget()
 {
 	NodeName = TEXT("타겟 추적");
 	bNotifyTaskFinished = true;
 }
 
-EBTNodeResult::Type UBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UDdBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController == nullptr)
@@ -42,7 +42,7 @@ EBTNodeResult::Type UBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& Own
 		// 이동 완료 콜백 등록
 		CachedOwnerComp = &OwnerComp;
 		MoveCompletedHandle = AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(
-			this, &UBTTask_ChaseTarget::OnMoveCompleted);
+			this, &UDdBTTask_ChaseTarget::OnMoveCompleted);
 		return EBTNodeResult::InProgress;
 	}
 
@@ -54,7 +54,7 @@ EBTNodeResult::Type UBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& Own
 	return EBTNodeResult::Failed;
 }
 
-EBTNodeResult::Type UBTTask_ChaseTarget::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UDdBTTask_ChaseTarget::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController != nullptr)
@@ -70,7 +70,7 @@ EBTNodeResult::Type UBTTask_ChaseTarget::AbortTask(UBehaviorTreeComponent& Owner
 	return EBTNodeResult::Aborted;
 }
 
-void UBTTask_ChaseTarget::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
+void UDdBTTask_ChaseTarget::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
 {
 	AAIController* AIController = OwnerComp.GetAIOwner();
 	if (AIController != nullptr)
@@ -84,7 +84,7 @@ void UBTTask_ChaseTarget::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 }
 
-void UBTTask_ChaseTarget::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+void UDdBTTask_ChaseTarget::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	if (CachedOwnerComp.IsValid())
 	{

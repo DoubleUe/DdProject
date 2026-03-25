@@ -3,16 +3,16 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "Navigation/PathFollowingComponent.h"
-#include "BTTask_ChaseTarget.generated.h"
+#include "DdBTTask_ChaseTarget.generated.h"
 
 // 타겟을 향해 비동기 이동하는 태스크
 UCLASS(Blueprintable)
-class DDPROJECT_API UBTTask_ChaseTarget : public UBTTaskNode
+class DDPROJECT_API UDdBTTask_ChaseTarget : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_ChaseTarget();
+	UDdBTTask_ChaseTarget();
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

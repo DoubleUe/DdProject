@@ -9,7 +9,7 @@
 #include "InputCoreTypes.h"
 #include "LevelEditor.h"
 #include "Modules/ModuleManager.h"
-#include "Test/TestManager.h"
+#include "Test/DdTestManager.h"
 #include "Commands/DdProjectEditorCommands.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Notifications/SNotificationList.h"
@@ -160,7 +160,7 @@ void FDdProjectEditorModule::SpawnZombieFromTools()
 		return;
 	}
 
-	ATestManager* TestManager = ATestManager::FindOrCreate(World);
+	ADdTestManager* TestManager = ADdTestManager::FindOrCreate(World);
 	if (TestManager == nullptr)
 	{
 		ShowNotification(LOCTEXT("NoTestManager", "Failed to find or create TestManager."));

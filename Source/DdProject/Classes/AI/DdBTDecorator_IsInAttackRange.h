@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTDecorator.h"
-#include "BTDecorator_IsInAttackRange.generated.h"
+#include "DdBTDecorator_IsInAttackRange.generated.h"
 
 // 타겟이 공격 범위 내에 있는지 확인하는 데코레이터
 UCLASS(Blueprintable)
-class DDPROJECT_API UBTDecorator_IsInAttackRange : public UBTDecorator
+class DDPROJECT_API UDdBTDecorator_IsInAttackRange : public UBTDecorator
 {
 	GENERATED_BODY()
 
 public:
-	UBTDecorator_IsInAttackRange();
+	UDdBTDecorator_IsInAttackRange();
 
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
