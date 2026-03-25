@@ -23,8 +23,11 @@ EBTNodeResult::Type UDdBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent&
 		return EBTNodeResult::Failed;
 	}
 
-	// 공격 애니메이션 재생 요청
-	Monster->PlayAttackAnimation();
+	// 공격 애니메이션 재생 요청 (노티파이에 의해 차단된 경우 실패)
+	if (!Monster->PlayAttackAnimation())
+	{
+		return EBTNodeResult::Failed;
+	}
 
 	// 공격 애니메이션이 끝날 때까지 대기
 	return EBTNodeResult::InProgress;

@@ -13,6 +13,9 @@ class DDPROJECT_API ADdBaseCharacter : public ACharacter
 public:
 	ADdBaseCharacter();
 
-	// 공격 중 이동 입력 차단 설정 (노티파이에서 호출)
+	// 이동 입력 차단 설정 (노티파이에서 호출)
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
+
+	// 공격 입력 차단 설정 (노티파이에서 호출)
+	virtual void SetAttackInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackInputBlocked, );
 };

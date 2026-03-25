@@ -15,13 +15,17 @@ class DDPROJECT_API ADdMonsterCharacter : public ADdBaseCharacter
 public:
 	ADdMonsterCharacter();
 
-	// 공격 애니메이션 재생 (AI 컨트롤러에서 호출)
+	// 공격 애니메이션 재생 (AI 컨트롤러에서 호출), 성공 여부 반환
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void PlayAttackAnimation();
+	bool PlayAttackAnimation();
 
 	// 공격 애니메이션 재생 중 여부
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsAttacking() const { return bIsAttacking; }
+
+	// 공격 입력 가능 여부 (노티파이에 의해 제어)
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool CanAttack() const { return !bAttackInputBlocked && !bIsAttacking; }
 
 	// 타겟 액터 설정/가져오기
 	UFUNCTION(BlueprintCallable, Category = "AI")
@@ -32,6 +36,13 @@ public:
 
 	// 공격 중 이동 차단 설정 (노티파이에서 호출)
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
+
+	// 공격 입력 차단 설정 (노티파이에서 호출)
+	virtual void SetAttackInputBlocked(bool bBlocked) override;
+
+	// 이동 차단 여부 확인 (노티파이에 의해 제어)
+	UFUNCTION(BlueprintPure, Category = "Movement")
+	bool IsMovementBlocked() const { return bAttackMovementBlocked; }
 
 	// 타겟까지 거리 설정/가져오기
 	UFUNCTION(BlueprintCallable, Category = "AI")
@@ -72,6 +83,9 @@ private:
 
 	// 공격 중 이동 차단 플래그 (노티파이에 의해 제어)
 	bool bAttackMovementBlocked = false;
+
+	// 공격 입력 차단 플래그 (노티파이에 의해 제어)
+	bool bAttackInputBlocked = true;
 
 	// AI 타겟 액터
 	UPROPERTY()

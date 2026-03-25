@@ -88,6 +88,11 @@ void ADdPlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 	bCanTransitionFromAttackToMovement = !bBlocked;
 }
 
+void ADdPlayerCharacter::SetAttackInputBlocked(bool bBlocked)
+{
+	bAttackInputBlocked = bBlocked;
+}
+
 void ADdPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -214,7 +219,7 @@ void ADdPlayerCharacter::Look(const FInputActionValue& Value)
 
 void ADdPlayerCharacter::Attack()
 {
-	if (bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
+	if (!CanProcessAttackInput() || bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
 	{
 		return;
 	}
@@ -274,4 +279,10 @@ bool ADdPlayerCharacter::CanProcessMovementInput() const
 {
 	// 노티파이가 이동을 허용한 상태에서만 이동 가능
 	return !bAttackMovementInputBlocked;
+}
+
+bool ADdPlayerCharacter::CanProcessAttackInput() const
+{
+	// 노티파이가 공격을 허용한 상태에서만 공격 가능
+	return !bAttackInputBlocked;
 }

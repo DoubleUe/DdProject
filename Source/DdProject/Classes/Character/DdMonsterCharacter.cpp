@@ -105,17 +105,28 @@ void ADdMonsterCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 	}
 }
 
-void ADdMonsterCharacter::PlayAttackAnimation()
+void ADdMonsterCharacter::SetAttackInputBlocked(bool bBlocked)
 {
-	// 이미 공격 중이면 무시
-	if (bIsAttacking)
+	bAttackInputBlocked = bBlocked;
+
+	// 노티파이가 공격을 허용하면 공격 상태 해제
+	if (!bBlocked && bIsAttacking)
 	{
-		return;
+		bIsAttacking = false;
+	}
+}
+
+bool ADdMonsterCharacter::PlayAttackAnimation()
+{
+	// 공격 입력이 차단된 상태이거나 이미 공격 중이면 실패
+	if (bAttackInputBlocked || bIsAttacking)
+	{
+		return false;
 	}
 
 	if (AttackAnimation == nullptr)
 	{
-		return;
+		return false;
 	}
 
 	bIsAttacking = true;
@@ -127,7 +138,7 @@ void ADdMonsterCharacter::PlayAttackAnimation()
 	if (MeshComponent == nullptr)
 	{
 		bIsAttacking = false;
-		return;
+		return false;
 	}
 
 	if (MeshComponent->GetAnimationMode() != EAnimationMode::AnimationSingleNode)
@@ -146,11 +157,13 @@ void ADdMonsterCharacter::PlayAttackAnimation()
 
 	// 블렌드 스페이스 초기화 (공격 끝난 후 이동 애니메이션이 다시 설정되도록)
 	bIsPlayingBlendSpace = false;
+
+	return true;
 }
 
 void ADdMonsterCharacter::OnAttackAnimationEnded()
 {
-	bIsAttacking = false;
+	// bIsAttacking은 UDdAttackInputNotifyState 노티파이가 제어
 	bIsPlayingBlendSpace = false;
 
 	// 노티파이가 정상적으로 종료되지 않은 경우 대비 안전장치
@@ -169,13 +182,15 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 	}
 
 	// 공격 애니메이션 재생 중에는 이동 애니메이션을 덮어쓰지 않음
-	if (bIsAttacking)
+	// 블렌드 스페이스가 이미 재생 중이면 노티파이 실행을 위해 계속 진행
+	if (bIsAttacking && !bIsPlayingBlendSpace)
 	{
 		// 공격 애니메이션이 끝났는지 확인
 		if (UAnimSingleNodeInstance* SingleNodeInstance = MeshComponent->GetSingleNodeInstance())
 		{
 			if (!SingleNodeInstance->IsPlaying())
 			{
+				// 애니메이션 종료 처리 후 블렌드 스페이스로 전환하여 노티파이 실행
 				OnAttackAnimationEnded();
 			}
 			else

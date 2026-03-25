@@ -24,6 +24,12 @@ EBTNodeResult::Type UDdBTTask_ChaseTarget::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
+	// 노티파이에 의해 이동이 차단된 상태면 실패
+	if (Monster->IsMovementBlocked())
+	{
+		return EBTNodeResult::Failed;
+	}
+
 	AActor* TargetActor = Monster->GetTargetActor();
 	if (TargetActor == nullptr)
 	{

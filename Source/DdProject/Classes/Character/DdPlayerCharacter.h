@@ -19,6 +19,7 @@ class DDPROJECT_API ADdPlayerCharacter : public ADdBaseCharacter
 public:
 	ADdPlayerCharacter();
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
+	virtual void SetAttackInputBlocked(bool bBlocked) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,6 +39,7 @@ private:
 	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();
 	bool CanProcessMovementInput() const;
+	bool CanProcessAttackInput() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDdPlayerCameraComponent> PlayerCameraComp;
@@ -68,6 +70,10 @@ private:
 
 	UPROPERTY()
 	bool bCanTransitionFromAttackToMovement = false;
+
+	// 공격 입력 차단 플래그 (노티파이에 의해 제어)
+	UPROPERTY()
+	bool bAttackInputBlocked = true;
 
 	FTimerHandle AttackAnimationTimerHandle;
 };
