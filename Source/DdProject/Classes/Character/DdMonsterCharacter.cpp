@@ -120,6 +120,9 @@ void ADdMonsterCharacter::PlayAttackAnimation()
 
 	bIsAttacking = true;
 
+	// 공격 시작 시 기본적으로 이동 차단 (노티파이가 있으면 해당 구간에서 허용)
+	SetAttackMovementInputBlocked(true);
+
 	USkeletalMeshComponent* MeshComponent = FindSkeletalMeshComponent();
 	if (MeshComponent == nullptr)
 	{

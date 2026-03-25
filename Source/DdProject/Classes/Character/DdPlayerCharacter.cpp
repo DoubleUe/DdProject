@@ -226,7 +226,7 @@ void ADdPlayerCharacter::Attack()
 	}
 
 	bAttackAnimationPlaying = true;
-	bAttackMovementInputBlocked = false;
+	bAttackMovementInputBlocked = true;
 	bCanTransitionFromAttackToMovement = false;
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
 	GetMesh()->PlayAnimation(AttackAnimation, false);
@@ -265,12 +265,13 @@ void ADdPlayerCharacter::TryBlendToMovementAnimation()
 void ADdPlayerCharacter::FinishAttackAnimation()
 {
 	bAttackAnimationPlaying = false;
-	bAttackMovementInputBlocked = false;
 	bCanTransitionFromAttackToMovement = false;
 	RestoreAnimationBlueprint();
+	// bAttackMovementInputBlocked는 복원된 AnimBP의 노티파이가 제어
 }
 
 bool ADdPlayerCharacter::CanProcessMovementInput() const
 {
-	return !bAttackAnimationPlaying || !bAttackMovementInputBlocked;
+	// 노티파이가 이동을 허용한 상태에서만 이동 가능
+	return !bAttackMovementInputBlocked;
 }

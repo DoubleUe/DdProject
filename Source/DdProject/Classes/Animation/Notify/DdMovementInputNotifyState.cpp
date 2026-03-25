@@ -25,11 +25,13 @@ static void SetMovementBlocked(USkeletalMeshComponent* MeshComp, bool bBlocked)
 void UDdMovementInputNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
-	SetMovementBlocked(MeshComp, true);
+	// 노티파이 구간 시작 → 이동 허용
+	SetMovementBlocked(MeshComp, false);
 }
 
 void UDdMovementInputNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
-	SetMovementBlocked(MeshComp, false);
+	// 노티파이 구간 종료 → 이동 차단
+	SetMovementBlocked(MeshComp, true);
 }

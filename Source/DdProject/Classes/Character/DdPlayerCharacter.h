@@ -64,7 +64,7 @@ private:
 	bool bAttackAnimationPlaying = false;
 
 	UPROPERTY()
-	bool bAttackMovementInputBlocked = false;
+	bool bAttackMovementInputBlocked = true;
 
 	UPROPERTY()
 	bool bCanTransitionFromAttackToMovement = false;
