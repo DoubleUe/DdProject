@@ -1,10 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimationAsset.h"
-#include "Animation/BlendSpace1D.h"
 #include "GameFramework/Character.h"
 #include "DdMonsterCharacter.generated.h"
+
+class UAnimationAsset;
+class UBlendSpace1D;
 
 UCLASS()
 class DDPROJECT_API ADdMonsterCharacter : public ACharacter
@@ -57,14 +58,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<UBlendSpace1D> IdleRunBlendSpace;
 
-	UPROPERTY()
-	TObjectPtr<UAnimationAsset> IdleAnimation;
-
-	UPROPERTY()
-	TObjectPtr<UAnimationAsset> RunAnimation;
-
-	UPROPERTY()
-	TObjectPtr<UAnimationAsset> CurrentLoopAnimation;
+	// 현재 재생 중인 블렌드 스페이스 추적용
+	bool bIsPlayingBlendSpace = false;
 
 	FVector PreviousAnimationLocation;
 	bool bHasPreviousAnimationLocation;

@@ -53,12 +53,10 @@ ADdMonsterCharacter::ADdMonsterCharacter()
 	}
 
 	IdleRunBlendSpace = nullptr;
-	IdleAnimation = nullptr;
-	RunAnimation = nullptr;
-	CurrentLoopAnimation = nullptr;
 	PreviousAnimationLocation = FVector::ZeroVector;
 	bHasPreviousAnimationLocation = false;
 	bIsAttacking = false;
+	bIsPlayingBlendSpace = false;
 }
 
 void ADdMonsterCharacter::BeginPlay()
@@ -79,25 +77,13 @@ void ADdMonsterCharacter::Tick(float DeltaSeconds)
 void ADdMonsterCharacter::LoadAnimationAssets()
 {
 	IdleRunBlendSpace = LoadObject<UBlendSpace1D>(nullptr, TEXT("/Game/Characters/Zombie/Animation/Zombie_IdleRun_1D.Zombie_IdleRun_1D"));
-	IdleAnimation = LoadObject<UAnimationAsset>(nullptr, TEXT("/Game/Characters/Zombie/Animation/Zombie_Idle.Zombie_Idle"));
-	RunAnimation = LoadObject<UAnimationAsset>(nullptr, TEXT("/Game/Characters/Zombie/Animation/Zombie_Running_Anim.Zombie_Running_Anim"));
 
 	if (IdleRunBlendSpace != nullptr)
 	{
 		IdleRunBlendSpace->ConditionalPostLoad();
 	}
 
-	if (IdleAnimation != nullptr)
-	{
-		IdleAnimation->ConditionalPostLoad();
-	}
-
-	if (RunAnimation != nullptr)
-	{
-		RunAnimation->ConditionalPostLoad();
-	}
-
-	CurrentLoopAnimation = nullptr;
+	bIsPlayingBlendSpace = false;
 }
 
 void ADdMonsterCharacter::PlayAttackAnimation()
@@ -136,20 +122,20 @@ void ADdMonsterCharacter::PlayAttackAnimation()
 		SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
 	}
 
-	// 현재 루프 애니메이션 초기화 (공격 끝난 후 이동 애니메이션이 다시 설정되도록)
-	CurrentLoopAnimation = nullptr;
+	// 블렌드 스페이스 초기화 (공격 끝난 후 이동 애니메이션이 다시 설정되도록)
+	bIsPlayingBlendSpace = false;
 }
 
 void ADdMonsterCharacter::OnAttackAnimationEnded()
 {
 	bIsAttacking = false;
-	CurrentLoopAnimation = nullptr;
+	bIsPlayingBlendSpace = false;
 }
 
 void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 {
 	USkeletalMeshComponent* MeshComponent = FindSkeletalMeshComponent();
-	if (MeshComponent == nullptr)
+	if (MeshComponent == nullptr || IdleRunBlendSpace == nullptr)
 	{
 		return;
 	}
@@ -192,6 +178,7 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 		return MeshComponent->GetSingleNodeInstance();
 	};
 
+	// 속도 계산
 	const FVector CurrentActorLocation = GetActorLocation();
 	float LocationSpeed2D = 0.0f;
 	if (bHasPreviousAnimationLocation && DeltaSeconds > UE_KINDA_SMALL_NUMBER)
@@ -206,61 +193,23 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 	const float ActorVelocitySpeed2D = GetVelocity().Size2D();
 	const float MovementComponentSpeed2D = CharacterMovementComponent != nullptr ? CharacterMovementComponent->Velocity.Size2D() : 0.0f;
 	const float Speed2D = FMath::Max(ActorVelocitySpeed2D, FMath::Max(MovementComponentSpeed2D, LocationSpeed2D));
-	const bool bIsMoving = Speed2D > 3.0f;
 
-	if (!bIsMoving)
-	{
-		if (IdleAnimation == nullptr || CurrentLoopAnimation == IdleAnimation)
-		{
-			return;
-		}
-
-		if (UAnimSingleNodeInstance* SingleNodeInstance = EnsureSingleNodeInstance())
-		{
-			SingleNodeInstance->SetAnimationAsset(IdleAnimation, true, 1.0f);
-			SingleNodeInstance->SetPlaying(true);
-			SingleNodeInstance->SetLooping(true);
-			SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
-		}
-		CurrentLoopAnimation = IdleAnimation;
-		return;
-	}
-
-	if (IdleRunBlendSpace != nullptr)
-	{
-		if (UAnimSingleNodeInstance* SingleNodeInstance = EnsureSingleNodeInstance())
-		{
-			if (SingleNodeInstance->GetCurrentAsset() != IdleRunBlendSpace)
-			{
-				SingleNodeInstance->SetAnimationAsset(IdleRunBlendSpace, true, 1.0f);
-			}
-
-			const float BlendSpeed = FMath::Clamp(Speed2D, 0.0f, 300.0f);
-
-			SingleNodeInstance->SetPlaying(true);
-			SingleNodeInstance->SetLooping(true);
-			SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
-			SingleNodeInstance->SetBlendSpacePosition(FVector(BlendSpeed, 0.0f, 0.0f));
-		}
-
-		CurrentLoopAnimation = IdleRunBlendSpace;
-		return;
-	}
-
-	UAnimationAsset* DesiredAnimation = RunAnimation;
-	if (DesiredAnimation == nullptr || CurrentLoopAnimation == DesiredAnimation)
-	{
-		return;
-	}
-
+	// 블렌드 스페이스로 아이들/런 모두 처리 (speed=0이면 아이들, speed>0이면 런)
 	if (UAnimSingleNodeInstance* SingleNodeInstance = EnsureSingleNodeInstance())
 	{
-		SingleNodeInstance->SetAnimationAsset(DesiredAnimation, true, 1.0f);
+		if (!bIsPlayingBlendSpace)
+		{
+			SingleNodeInstance->SetAnimationAsset(IdleRunBlendSpace, true, 1.0f);
+			bIsPlayingBlendSpace = true;
+		}
+
+		const float BlendSpeed = FMath::Clamp(Speed2D, 0.0f, 300.0f);
+
 		SingleNodeInstance->SetPlaying(true);
 		SingleNodeInstance->SetLooping(true);
 		SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
+		SingleNodeInstance->SetBlendSpacePosition(FVector(BlendSpeed, 0.0f, 0.0f));
 	}
-	CurrentLoopAnimation = DesiredAnimation;
 }
 
 USkeletalMeshComponent* ADdMonsterCharacter::FindSkeletalMeshComponent() const
