@@ -46,10 +46,15 @@ ADdMonsterCharacter::ADdMonsterCharacter()
 		}
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimationAsset> AttackAnimationAsset(TEXT("/Game/Characters/Zombie/Animation/Zombie_Punching_1.Zombie_Punching_1"));
+	if (AttackAnimationAsset.Succeeded())
+	{
+		AttackAnimation = AttackAnimationAsset.Object;
+	}
+
 	IdleRunBlendSpace = nullptr;
 	IdleAnimation = nullptr;
 	RunAnimation = nullptr;
-	AttackAnimation = nullptr;
 	CurrentLoopAnimation = nullptr;
 	PreviousAnimationLocation = FVector::ZeroVector;
 	bHasPreviousAnimationLocation = false;
@@ -110,7 +115,7 @@ void ADdMonsterCharacter::PlayAttackAnimation()
 
 	bIsAttacking = true;
 
-	USkeletalMeshComponent* MeshComponent = GetMesh();
+	USkeletalMeshComponent* MeshComponent = FindSkeletalMeshComponent();
 	if (MeshComponent == nullptr)
 	{
 		bIsAttacking = false;
@@ -143,7 +148,7 @@ void ADdMonsterCharacter::OnAttackAnimationEnded()
 
 void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 {
-	USkeletalMeshComponent* MeshComponent = GetMesh();
+	USkeletalMeshComponent* MeshComponent = FindSkeletalMeshComponent();
 	if (MeshComponent == nullptr)
 	{
 		return;
@@ -256,4 +261,28 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 		SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
 	}
 	CurrentLoopAnimation = DesiredAnimation;
+}
+
+USkeletalMeshComponent* ADdMonsterCharacter::FindSkeletalMeshComponent() const
+{
+	// 기본 ACharacter 메시 우선 사용
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	if (MeshComp != nullptr && MeshComp->GetSkeletalMeshAsset() != nullptr)
+	{
+		return MeshComp;
+	}
+
+	// BP에서 별도 추가된 SkeletalMeshComponent 검색
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponents;
+	GetComponents<USkeletalMeshComponent>(SkeletalMeshComponents);
+	for (USkeletalMeshComponent* Comp : SkeletalMeshComponents)
+	{
+		if (Comp != nullptr && Comp->GetSkeletalMeshAsset() != nullptr)
+		{
+			return Comp;
+		}
+	}
+
+	// 메시 에셋이 없더라도 기본 컴포넌트 반환
+	return MeshComp;
 }

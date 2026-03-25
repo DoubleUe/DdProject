@@ -51,6 +51,9 @@ private:
 	// 공격 애니메이션 종료 콜백
 	void OnAttackAnimationEnded();
 
+	// 유효한 SkeletalMeshComponent를 반환 (GetMesh() 실패 시 컴포넌트 검색)
+	USkeletalMeshComponent* FindSkeletalMeshComponent() const;
+
 	UPROPERTY()
 	TObjectPtr<UBlendSpace1D> IdleRunBlendSpace;
 
