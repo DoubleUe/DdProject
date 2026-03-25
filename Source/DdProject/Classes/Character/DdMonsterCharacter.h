@@ -1,14 +1,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "DdBaseCharacter.h"
 #include "DdMonsterCharacter.generated.h"
 
 class UAnimationAsset;
 class UBlendSpace1D;
 
 UCLASS()
-class DDPROJECT_API ADdMonsterCharacter : public ACharacter
+class DDPROJECT_API ADdMonsterCharacter : public ADdBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -29,6 +29,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AI")
 	AActor* GetTargetActor() const { return TargetActor.Get(); }
+
+	// 공격 중 이동 차단 설정 (노티파이에서 호출)
+	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
 
 	// 타겟까지 거리 설정/가져오기
 	UFUNCTION(BlueprintCallable, Category = "AI")
@@ -66,6 +69,9 @@ private:
 
 	// 공격 중 플래그
 	bool bIsAttacking = false;
+
+	// 공격 중 이동 차단 플래그 (노티파이에 의해 제어)
+	bool bAttackMovementBlocked = false;
 
 	// AI 타겟 액터
 	UPROPERTY()

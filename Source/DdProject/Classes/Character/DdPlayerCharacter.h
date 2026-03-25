@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "DdBaseCharacter.h"
 #include "TimerManager.h"
 #include "DdPlayerCharacter.generated.h"
 
@@ -12,13 +12,13 @@ class UDdPlayerCameraComponent;
 struct FInputActionValue;
 
 UCLASS()
-class DDPROJECT_API ADdPlayerCharacter : public ACharacter
+class DDPROJECT_API ADdPlayerCharacter : public ADdBaseCharacter
 {
 	GENERATED_BODY()
 
 public:
 	ADdPlayerCharacter();
-	void SetAttackMovementInputBlocked(bool bBlocked);
+	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
 
 protected:
 	virtual void BeginPlay() override;

@@ -86,6 +86,25 @@ void ADdMonsterCharacter::LoadAnimationAssets()
 	bIsPlayingBlendSpace = false;
 }
 
+void ADdMonsterCharacter::SetAttackMovementInputBlocked(bool bBlocked)
+{
+	bAttackMovementBlocked = bBlocked;
+
+	if (bBlocked)
+	{
+		// AI 이동 즉시 정지
+		if (AAIController* AIC = Cast<AAIController>(GetController()))
+		{
+			AIC->StopMovement();
+		}
+		GetCharacterMovement()->DisableMovement();
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+}
+
 void ADdMonsterCharacter::PlayAttackAnimation()
 {
 	// 이미 공격 중이면 무시
@@ -130,6 +149,12 @@ void ADdMonsterCharacter::OnAttackAnimationEnded()
 {
 	bIsAttacking = false;
 	bIsPlayingBlendSpace = false;
+
+	// 노티파이가 정상적으로 종료되지 않은 경우 대비 안전장치
+	if (bAttackMovementBlocked)
+	{
+		SetAttackMovementInputBlocked(false);
+	}
 }
 
 void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
