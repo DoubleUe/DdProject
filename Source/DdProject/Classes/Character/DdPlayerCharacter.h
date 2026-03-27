@@ -25,11 +25,6 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void Turn(float Value);
-	void LookUp(float Value);
-	void ZoomCamera(float Value);
 	void CameraZoom(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -50,9 +45,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UInputAction> MouseLookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Animation", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UAnimSequenceBase> AttackAnimation;

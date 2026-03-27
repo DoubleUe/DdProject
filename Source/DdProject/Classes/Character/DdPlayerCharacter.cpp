@@ -60,12 +60,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 		LookAction = LookActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLookActionAsset(TEXT("/Game/Design/Input/Actions/IA_MouseLook.IA_MouseLook"));
-	if (MouseLookActionAsset.Succeeded())
-	{
-		MouseLookAction = MouseLookActionAsset.Object;
-	}
-
 	static ConstructorHelpers::FObjectFinder<UAnimSequenceBase> AttackAnimationAsset(TEXT("/Game/Characters/Player/Animations/Standing_Melee_Attack_Downward.Standing_Melee_Attack_Downward"));
 	if (AttackAnimationAsset.Succeeded())
 	{
@@ -110,11 +104,6 @@ void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
 	}
 
-	if (MouseLookAction != nullptr)
-	{
-		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
-	}
-
 	if (const ADdGameplayPlayerController* GameplayPlayerController = Cast<ADdGameplayPlayerController>(GetController()))
 	{
 		if (const UInputAction* AttackAction = GameplayPlayerController->GetGameplayAttackAction())
@@ -139,9 +128,19 @@ void ADdPlayerCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-void ADdPlayerCharacter::MoveForward(float Value)
+void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
 {
-	/*if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
+	if (PlayerCameraComp != nullptr)
+	{
+		PlayerCameraComp->ZoomCamera(Value.Get<float>());
+	}
+}
+
+void ADdPlayerCharacter::Move(const FInputActionValue& Value)
+{
+	const FVector2D MovementVector = Value.Get<FVector2D>();
+
+	/*if (Controller == nullptr || !CanProcessMovementInput())
 	{
 		return;
 	}
@@ -151,65 +150,25 @@ void ADdPlayerCharacter::MoveForward(float Value)
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	AddMovementInput(ForwardDirection, Value);
-}
-
-void ADdPlayerCharacter::MoveRight(float Value)
-{
-	/*if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
-	{
-		return;
-	}
-
-	TryBlendToMovementAnimation();*/
-
-	const FRotator ControlRotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(RightDirection, Value);
-}
 
-void ADdPlayerCharacter::Turn(float Value)
-{
-	if (!FMath::IsNearlyZero(Value))
-	{
-		AddControllerYawInput(Value);
-	}
-}
-
-void ADdPlayerCharacter::LookUp(float Value)
-{
-	if (!FMath::IsNearlyZero(Value))
-	{
-		AddControllerPitchInput(-Value);
-	}
-}
-
-void ADdPlayerCharacter::ZoomCamera(float Value)
-{
-	if (PlayerCameraComp != nullptr)
-	{
-		PlayerCameraComp->ZoomCamera(Value);
-	}
-}
-
-void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
-{
-	ZoomCamera(Value.Get<float>());
-}
-
-void ADdPlayerCharacter::Move(const FInputActionValue& Value)
-{
-	const FVector2D MovementVector = Value.Get<FVector2D>();
-	MoveForward(MovementVector.Y);
-	MoveRight(MovementVector.X);
+	AddMovementInput(ForwardDirection, MovementVector.Y);
+	AddMovementInput(RightDirection, MovementVector.X);
 }
 
 void ADdPlayerCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
-	Turn(LookAxisVector.X);
-	LookUp(LookAxisVector.Y);
+	if (!FMath::IsNearlyZero(LookAxisVector.X))
+	{
+		AddControllerYawInput(LookAxisVector.X);
+	}
+
+	const float PitchInput = -LookAxisVector.Y;
+	if (!FMath::IsNearlyZero(PitchInput))
+	{
+		AddControllerPitchInput(PitchInput);
+	}
 }
 
 void ADdPlayerCharacter::Attack()
