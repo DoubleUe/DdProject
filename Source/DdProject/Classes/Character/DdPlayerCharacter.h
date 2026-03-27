@@ -5,7 +5,6 @@
 #include "TimerManager.h"
 #include "DdPlayerCharacter.generated.h"
 
-class UClass;
 class UAnimSequenceBase;
 class UInputAction;
 class UDdPlayerCameraComponent;
@@ -22,7 +21,6 @@ public:
 	virtual void SetAttackInputBlocked(bool bBlocked) override;
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -35,7 +33,6 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Attack();
-	void RestoreAnimationBlueprint();
 	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();
 	bool CanProcessMovementInput() const;
@@ -58,9 +55,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Animation", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UAnimSequenceBase> AttackAnimation;
-
-	UPROPERTY()
-	TObjectPtr<UClass> CharacterAnimBlueprintClass;
 
 	UPROPERTY()
 	bool bAttackAnimationPlaying = false;

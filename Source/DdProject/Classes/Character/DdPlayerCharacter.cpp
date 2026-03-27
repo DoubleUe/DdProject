@@ -1,6 +1,5 @@
 #include "DdPlayerCharacter.h"
 
-#include "Animation/AnimInstance.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Component/DdPlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -32,7 +31,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 	CharacterMovementComponent->BrakingDecelerationWalking = 2000.0f;
 	CharacterMovementComponent->BrakingDecelerationFalling = 1500.0f;
 
-	// 카메라 컴포넌트 생성
 	PlayerCameraComp = CreateDefaultSubobject<UDdPlayerCameraComponent>(TEXT("PlayerCameraComp"));
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -97.0f), FRotator(0.0f, -90.0f, 0.0f));
@@ -41,14 +39,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 	if (MeshAsset.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(MeshAsset.Object);
-	}
-
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprintClass(TEXT("/Game/Characters/Player/Animations/ThirdPerson_AnimBP"));
-	if (AnimBlueprintClass.Class != nullptr)
-	{
-		CharacterAnimBlueprintClass = AnimBlueprintClass.Class;
-		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Design/Input/Actions/IA_Jump.IA_Jump"));
@@ -91,11 +81,6 @@ void ADdPlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 void ADdPlayerCharacter::SetAttackInputBlocked(bool bBlocked)
 {
 	bAttackInputBlocked = bBlocked;
-}
-
-void ADdPlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -243,17 +228,6 @@ void ADdPlayerCharacter::Attack()
 		false);
 }
 
-void ADdPlayerCharacter::RestoreAnimationBlueprint()
-{
-	if (GetMesh() == nullptr || CharacterAnimBlueprintClass == nullptr)
-	{
-		return;
-	}
-
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
-}
-
 void ADdPlayerCharacter::TryBlendToMovementAnimation()
 {
 	if (!bAttackAnimationPlaying || bAttackMovementInputBlocked || !bCanTransitionFromAttackToMovement)
@@ -264,25 +238,20 @@ void ADdPlayerCharacter::TryBlendToMovementAnimation()
 	bAttackAnimationPlaying = false;
 	bCanTransitionFromAttackToMovement = false;
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
-	RestoreAnimationBlueprint();
 }
 
 void ADdPlayerCharacter::FinishAttackAnimation()
 {
 	bAttackAnimationPlaying = false;
 	bCanTransitionFromAttackToMovement = false;
-	RestoreAnimationBlueprint();
-	// bAttackMovementInputBlocked는 복원된 AnimBP의 노티파이가 제어
 }
 
 bool ADdPlayerCharacter::CanProcessMovementInput() const
 {
-	// 노티파이가 이동을 허용한 상태에서만 이동 가능
 	return !bAttackMovementInputBlocked;
 }
 
 bool ADdPlayerCharacter::CanProcessAttackInput() const
 {
-	// 노티파이가 공격을 허용한 상태에서만 공격 가능
 	return !bAttackInputBlocked;
 }
