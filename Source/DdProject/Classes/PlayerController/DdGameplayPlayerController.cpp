@@ -13,13 +13,13 @@
 
 ADdGameplayPlayerController::ADdGameplayPlayerController()
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextAsset(TEXT("/Game/Characters/Player/Input/IMC_Default.IMC_Default"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextAsset(TEXT("/Game/Design/Input/IMC_Default.IMC_Default"));
 	if (DefaultMappingContextAsset.Succeeded())
 	{
 		GameplayDefaultMappingContext = DefaultMappingContextAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MouseLookMappingContextAsset(TEXT("/Game/Characters/Player/Input/IMC_MouseLook.IMC_MouseLook"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MouseLookMappingContextAsset(TEXT("/Game/Design/Input/IMC_MouseLook.IMC_MouseLook"));
 	if (MouseLookMappingContextAsset.Succeeded())
 	{
 		GameplayMouseLookMappingContext = MouseLookMappingContextAsset.Object;

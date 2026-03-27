@@ -51,25 +51,25 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 		GetMesh()->SetAnimInstanceClass(CharacterAnimBlueprintClass);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Jump.IA_Jump"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Design/Input/Actions/IA_Jump.IA_Jump"));
 	if (JumpActionAsset.Succeeded())
 	{
 		JumpAction = JumpActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Move.IA_Move"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Design/Input/Actions/IA_Move.IA_Move"));
 	if (MoveActionAsset.Succeeded())
 	{
 		MoveAction = MoveActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_Look.IA_Look"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Design/Input/Actions/IA_Look.IA_Look"));
 	if (LookActionAsset.Succeeded())
 	{
 		LookAction = LookActionAsset.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLookActionAsset(TEXT("/Game/Characters/Player/Input/Actions/IA_MouseLook.IA_MouseLook"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLookActionAsset(TEXT("/Game/Design/Input/Actions/IA_MouseLook.IA_MouseLook"));
 	if (MouseLookActionAsset.Succeeded())
 	{
 		MouseLookAction = MouseLookActionAsset.Object;
