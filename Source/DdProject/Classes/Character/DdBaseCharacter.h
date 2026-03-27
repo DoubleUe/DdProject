@@ -4,7 +4,8 @@
 #include "GameFramework/Character.h"
 #include "DdBaseCharacter.generated.h"
 
-// 플레이어와 몬스터의 공통 베이스 캐릭터 클래스
+class UCharacterTrajectoryComponent;
+
 UCLASS(Abstract)
 class DDPROJECT_API ADdBaseCharacter : public ACharacter
 {
@@ -13,9 +14,13 @@ class DDPROJECT_API ADdBaseCharacter : public ACharacter
 public:
 	ADdBaseCharacter();
 
-	// 이동 입력 차단 설정 (노티파이에서 호출)
-	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
+	UFUNCTION(BlueprintPure, Category = "Trajectory")
+	UCharacterTrajectoryComponent* GetTrajectoryComponent() const;
 
-	// 공격 입력 차단 설정 (노티파이에서 호출)
+	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
 	virtual void SetAttackInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackInputBlocked, );
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Trajectory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCharacterTrajectoryComponent> TrajectoryComponent;
 };

@@ -151,12 +151,12 @@ void ADdPlayerCharacter::Tick(float DeltaSeconds)
 
 void ADdPlayerCharacter::MoveForward(float Value)
 {
-	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
+	/*if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
 		return;
 	}
 
-	TryBlendToMovementAnimation();
+	TryBlendToMovementAnimation();*/
 
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
@@ -166,12 +166,12 @@ void ADdPlayerCharacter::MoveForward(float Value)
 
 void ADdPlayerCharacter::MoveRight(float Value)
 {
-	if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
+	/*if (FMath::IsNearlyZero(Value) || Controller == nullptr || !CanProcessMovementInput())
 	{
 		return;
 	}
 
-	TryBlendToMovementAnimation();
+	TryBlendToMovementAnimation();*/
 
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
