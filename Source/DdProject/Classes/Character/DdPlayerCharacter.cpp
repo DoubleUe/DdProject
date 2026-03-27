@@ -10,6 +10,7 @@
 #include "InputActionValue.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
+#include "../PlayerController/DdGameplayPlayerController.h"
 
 ADdPlayerCharacter::ADdPlayerCharacter()
 {
@@ -87,15 +88,6 @@ void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ADdPlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ADdPlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ADdPlayerCharacter::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ADdPlayerCharacter::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("CameraZoom"), this, &ADdPlayerCharacter::ZoomCamera);
-	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &ADdPlayerCharacter::Attack);
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
-
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent == nullptr)
 	{
@@ -121,6 +113,19 @@ void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	if (MouseLookAction != nullptr)
 	{
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
+	}
+
+	if (const ADdGameplayPlayerController* GameplayPlayerController = Cast<ADdGameplayPlayerController>(GetController()))
+	{
+		if (const UInputAction* AttackAction = GameplayPlayerController->GetGameplayAttackAction())
+		{
+			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ADdPlayerCharacter::Attack);
+		}
+
+		if (const UInputAction* CameraZoomAction = GameplayPlayerController->GetGameplayCameraZoomAction())
+		{
+			EnhancedInputComponent->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::CameraZoom);
+		}
 	}
 }
 
@@ -186,6 +191,11 @@ void ADdPlayerCharacter::ZoomCamera(float Value)
 	{
 		PlayerCameraComp->ZoomCamera(Value);
 	}
+}
+
+void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
+{
+	ZoomCamera(Value.Get<float>());
 }
 
 void ADdPlayerCharacter::Move(const FInputActionValue& Value)

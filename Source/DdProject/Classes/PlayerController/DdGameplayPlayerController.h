@@ -10,6 +10,8 @@ class DDPROJECT_API ADdGameplayPlayerController : public APlayerController
 
 public:
 	ADdGameplayPlayerController();
+	const class UInputAction* GetGameplayAttackAction() const { return GameplayAttackAction; }
+	const class UInputAction* GetGameplayCameraZoomAction() const { return GameplayCameraZoomAction; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,6 +41,15 @@ private:
 
 	UPROPERTY()
 	class UInputMappingContext* GameplayMouseLookMappingContext;
+
+	UPROPERTY()
+	class UInputMappingContext* GameplayUtilityMappingContext;
+
+	UPROPERTY()
+	class UInputAction* GameplayAttackAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayCameraZoomAction;
 
 	UPROPERTY()
 	bool bTemporaryCursorModeActive = false;

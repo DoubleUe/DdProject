@@ -30,6 +30,7 @@ private:
 	void Turn(float Value);
 	void LookUp(float Value);
 	void ZoomCamera(float Value);
+	void CameraZoom(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Attack();

@@ -3,6 +3,8 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "InputAction.h"
+#include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "InputCoreTypes.h"
 #include "UObject/ConstructorHelpers.h"
@@ -13,6 +15,33 @@
 
 ADdGameplayPlayerController::ADdGameplayPlayerController()
 {
+	GameplayUtilityMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("GameplayUtilityMappingContext"));
+	GameplayAttackAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayAttackAction"));
+	GameplayCameraZoomAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayCameraZoomAction"));
+
+	if (GameplayAttackAction != nullptr)
+	{
+		GameplayAttackAction->ValueType = EInputActionValueType::Boolean;
+	}
+
+	if (GameplayCameraZoomAction != nullptr)
+	{
+		GameplayCameraZoomAction->ValueType = EInputActionValueType::Axis1D;
+	}
+
+	if (GameplayUtilityMappingContext != nullptr)
+	{
+		if (GameplayAttackAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayAttackAction, EKeys::LeftMouseButton);
+		}
+
+		if (GameplayCameraZoomAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayCameraZoomAction, EKeys::MouseWheelAxis);
+		}
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextAsset(TEXT("/Game/Design/Input/IMC_Default.IMC_Default"));
 	if (DefaultMappingContextAsset.Succeeded())
 	{
@@ -121,6 +150,12 @@ void ADdGameplayPlayerController::RegisterGameplayMappingContexts()
 	{
 		InputSubsystem->RemoveMappingContext(GameplayMouseLookMappingContext);
 		InputSubsystem->AddMappingContext(GameplayMouseLookMappingContext, 0);
+	}
+
+	if (GameplayUtilityMappingContext != nullptr)
+	{
+		InputSubsystem->RemoveMappingContext(GameplayUtilityMappingContext);
+		InputSubsystem->AddMappingContext(GameplayUtilityMappingContext, 1);
 	}
 }
 
