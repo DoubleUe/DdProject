@@ -17,6 +17,7 @@
 # Source art
 SourceArt/**/*.png
 SourceArt/**/*.tga
+Content/AssetStore/
 
 # Unreal generated output
 Binaries/*
