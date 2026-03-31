@@ -17,6 +17,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Trajectory")
 	UCharacterTrajectoryComponent* GetTrajectoryComponent() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Movement|Rotation")
+	void ToggleRotationMode();
+
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
 	virtual void SetAttackInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackInputBlocked, );
 
