@@ -3,7 +3,9 @@
 #include "Blueprint/UserWidget.h"
 #include "DdTitleScreenWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnStartGameRequested);
+DECLARE_MULTICAST_DELEGATE(FOnSingleGameRequested);
+DECLARE_MULTICAST_DELEGATE(FOnHostGameRequested);
+DECLARE_MULTICAST_DELEGATE(FOnJoinGameRequested);
 
 UCLASS()
 class DDPROJECT_API UDdTitleScreenWidget : public UUserWidget
@@ -11,15 +13,29 @@ class DDPROJECT_API UDdTitleScreenWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	FOnStartGameRequested OnStartGameRequested;
+	FOnSingleGameRequested OnSingleGameRequested;
+	FOnHostGameRequested OnHostGameRequested;
+	FOnJoinGameRequested OnJoinGameRequested;
 
 protected:
 	virtual void NativeOnInitialized() override;
 
 private:
 	UFUNCTION()
-	void HandleStartButtonClicked();
+	void HandleSingleButtonClicked();
+
+	UFUNCTION()
+	void HandleHostButtonClicked();
+
+	UFUNCTION()
+	void HandleJoinButtonClicked();
+	
+	UPROPERTY(meta=(BindWidgetOptional))
+	class UButton* SingleButton;
 
 	UPROPERTY(meta=(BindWidgetOptional))
-	class UButton* StartButton;
+	class UButton* HostButton;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	class UButton* JoinButton;
 };

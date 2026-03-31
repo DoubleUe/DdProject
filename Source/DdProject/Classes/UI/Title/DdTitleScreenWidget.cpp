@@ -6,13 +6,33 @@ void UDdTitleScreenWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	if (StartButton != nullptr)
+	if (SingleButton != nullptr)
 	{
-		StartButton->OnClicked.AddDynamic(this, &UDdTitleScreenWidget::HandleStartButtonClicked);
+		SingleButton->OnClicked.AddDynamic(this, &UDdTitleScreenWidget::HandleSingleButtonClicked);
+	}
+
+	if (HostButton != nullptr)
+	{
+		HostButton->OnClicked.AddDynamic(this, &UDdTitleScreenWidget::HandleHostButtonClicked);
+	}
+
+	if (JoinButton != nullptr)
+	{
+		JoinButton->OnClicked.AddDynamic(this, &UDdTitleScreenWidget::HandleJoinButtonClicked);
 	}
 }
 
-void UDdTitleScreenWidget::HandleStartButtonClicked()
+void UDdTitleScreenWidget::HandleSingleButtonClicked()
 {
-	OnStartGameRequested.Broadcast();
+	OnSingleGameRequested.Broadcast();
+}
+
+void UDdTitleScreenWidget::HandleHostButtonClicked()
+{
+	OnHostGameRequested.Broadcast();
+}
+
+void UDdTitleScreenWidget::HandleJoinButtonClicked()
+{
+	OnJoinGameRequested.Broadcast();
 }
