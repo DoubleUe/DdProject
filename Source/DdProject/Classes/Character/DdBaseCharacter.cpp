@@ -4,9 +4,12 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ADdBaseCharacter::ADdBaseCharacter()
 {
+	bReplicates = true;
+
 	TrajectoryComponent = CreateDefaultSubobject<UCharacterTrajectoryComponent>(TEXT("TrajectoryComponent"));
 	EquippedStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EquippedStaticMeshComponent"));
 
@@ -17,6 +20,9 @@ ADdBaseCharacter::ADdBaseCharacter()
 		EquippedStaticMeshComponent->SetGenerateOverlapEvents(false);
 		EquippedStaticMeshComponent->SetCanEverAffectNavigation(false);
 	}
+
+	ApplyRotationModeFromState();
+	ApplyWalkSpeedFromState();
 }
 
 void ADdBaseCharacter::OnConstruction(const FTransform& Transform)
@@ -31,30 +37,89 @@ UCharacterTrajectoryComponent* ADdBaseCharacter::GetTrajectoryComponent() const
 	return TrajectoryComponent;
 }
 
+void ADdBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADdBaseCharacter, bUseControllerDesiredRotationMode);
+	DOREPLIFETIME(ADdBaseCharacter, bUseSlowWalkSpeed);
+}
+
 void ADdBaseCharacter::ToggleRotationMode()
 {
-	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
-	if (CharacterMovementComponent == nullptr)
+	const bool bNextUseControllerDesiredRotationMode = !bUseControllerDesiredRotationMode;
+	SetUseControllerDesiredRotationMode(bNextUseControllerDesiredRotationMode);
+
+	if (!HasAuthority())
 	{
-		return;
+		ServerSetUseControllerDesiredRotationMode(bNextUseControllerDesiredRotationMode);
 	}
-
-	const bool bUseControllerDesiredRotation = CharacterMovementComponent->bOrientRotationToMovement;
-
-	CharacterMovementComponent->bOrientRotationToMovement = !bUseControllerDesiredRotation;
-	CharacterMovementComponent->bUseControllerDesiredRotation = bUseControllerDesiredRotation;
 }
 
 void ADdBaseCharacter::ToggleWalkSpeed()
 {
+	const bool bNextUseSlowWalkSpeed = !bUseSlowWalkSpeed;
+	SetUseSlowWalkSpeed(bNextUseSlowWalkSpeed);
+
+	if (!HasAuthority())
+	{
+		ServerSetUseSlowWalkSpeed(bNextUseSlowWalkSpeed);
+	}
+}
+
+void ADdBaseCharacter::ApplyWalkSpeedFromState()
+{
 	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
 	if (CharacterMovementComponent == nullptr)
 	{
 		return;
 	}
 
-	bUseSlowWalkSpeed = !bUseSlowWalkSpeed;
 	CharacterMovementComponent->MaxWalkSpeed = bUseSlowWalkSpeed ? SlowWalkSpeed : NormalWalkSpeed;
+}
+
+void ADdBaseCharacter::SetUseSlowWalkSpeed(bool bInUseSlowWalkSpeed)
+{
+	bUseSlowWalkSpeed = bInUseSlowWalkSpeed;
+	ApplyWalkSpeedFromState();
+}
+
+void ADdBaseCharacter::ApplyRotationModeFromState()
+{
+	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
+	if (CharacterMovementComponent == nullptr)
+	{
+		return;
+	}
+
+	CharacterMovementComponent->bOrientRotationToMovement = !bUseControllerDesiredRotationMode;
+	CharacterMovementComponent->bUseControllerDesiredRotation = bUseControllerDesiredRotationMode;
+}
+
+void ADdBaseCharacter::SetUseControllerDesiredRotationMode(bool bInUseControllerDesiredRotationMode)
+{
+	bUseControllerDesiredRotationMode = bInUseControllerDesiredRotationMode;
+	ApplyRotationModeFromState();
+}
+
+void ADdBaseCharacter::OnRep_UseControllerDesiredRotationMode()
+{
+	ApplyRotationModeFromState();
+}
+
+void ADdBaseCharacter::OnRep_UseSlowWalkSpeed()
+{
+	ApplyWalkSpeedFromState();
+}
+
+void ADdBaseCharacter::ServerSetUseControllerDesiredRotationMode_Implementation(bool bInUseControllerDesiredRotationMode)
+{
+	SetUseControllerDesiredRotationMode(bInUseControllerDesiredRotationMode);
+}
+
+void ADdBaseCharacter::ServerSetUseSlowWalkSpeed_Implementation(bool bInUseSlowWalkSpeed)
+{
+	SetUseSlowWalkSpeed(bInUseSlowWalkSpeed);
 }
 
 void ADdBaseCharacter::InitializeEquippedStaticMeshAttachment()
