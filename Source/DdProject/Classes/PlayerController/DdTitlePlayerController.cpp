@@ -1,11 +1,11 @@
 #include "DdTitlePlayerController.h"
 
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SocketSubsystem.h"
 #include "Sockets.h"
+#include "TimerManager.h"
 #include "../UI/Title/DdScreenFadeWidget.h"
 #include "../UI/Title/DdTitleScreenSettings.h"
 #include "../UI/Title/DdTitleScreenWidget.h"
@@ -28,7 +28,8 @@ void ADdTitlePlayerController::BeginPlay()
 		GEngine->OnNetworkFailure().AddUObject(this, &ADdTitlePlayerController::HandleNetworkFailure);
 	}
 
-	EnsureScreenFadeWidget();
+	InitializeSharedLocalControllerState();
+	BindScreenFadeWidgetEvents();
 
 	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (ScreenFadeWidget != nullptr && Settings != nullptr)
@@ -37,6 +38,17 @@ void ADdTitlePlayerController::BeginPlay()
 	}
 
 	ShowTitleScreen();
+}
+
+void ADdTitlePlayerController::BindScreenFadeWidgetEvents()
+{
+	if (ScreenFadeWidget == nullptr)
+	{
+		return;
+	}
+
+	ScreenFadeWidget->OnFadeFinished.RemoveAll(this);
+	ScreenFadeWidget->OnFadeFinished.AddUObject(this, &ADdTitlePlayerController::HandleScreenFadeFinished);
 }
 
 void ADdTitlePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -62,47 +74,6 @@ void ADdTitlePlayerController::ConfigureTitleInput()
 	bShowMouseCursor = true;
 	bEnableClickEvents = true;
 	bEnableMouseOverEvents = true;
-}
-
-void ADdTitlePlayerController::EnsureScreenFadeWidget()
-{
-	if (ScreenFadeWidget == nullptr)
-	{
-		TArray<UUserWidget*> FoundWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UDdScreenFadeWidget::StaticClass(), false);
-
-		for (UUserWidget* FoundWidget : FoundWidgets)
-		{
-			if (UDdScreenFadeWidget* ExistingFadeWidget = Cast<UDdScreenFadeWidget>(FoundWidget))
-			{
-				ScreenFadeWidget = ExistingFadeWidget;
-				break;
-			}
-		}
-	}
-
-	if (ScreenFadeWidget == nullptr)
-	{
-		const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
-		UClass* ScreenFadeWidgetClass = Settings != nullptr ? Settings->ScreenFadeWidgetClass.LoadSynchronous() : nullptr;
-		if (ScreenFadeWidgetClass == nullptr)
-		{
-			ScreenFadeWidgetClass = UDdScreenFadeWidget::StaticClass();
-		}
-
-		ScreenFadeWidget = CreateWidget<UDdScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
-		if (ScreenFadeWidget != nullptr)
-		{
-			ScreenFadeWidget->AddToViewport(1000);
-			ScreenFadeWidget->SetFadeAlpha(1.0f);
-		}
-	}
-
-	if (ScreenFadeWidget != nullptr)
-	{
-		ScreenFadeWidget->OnFadeFinished.RemoveAll(this);
-		ScreenFadeWidget->OnFadeFinished.AddUObject(this, &ADdTitlePlayerController::HandleScreenFadeFinished);
-	}
 }
 
 void ADdTitlePlayerController::ShowTitleScreen()
@@ -187,6 +158,7 @@ void ADdTitlePlayerController::StartTitleAction(ETitleAction InAction)
 	PendingTitleAction = InAction;
 	SetTitleScreenInteractivity(false);
 	EnsureScreenFadeWidget();
+	BindScreenFadeWidgetEvents();
 
 	const float FadeOutDuration = FMath::Max(Settings->FadeOutDuration, 0.0f);
 	if (ScreenFadeWidget != nullptr && FadeOutDuration > KINDA_SMALL_NUMBER)

@@ -1,6 +1,5 @@
 #include "DdGameplayPlayerController.h"
 
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputAction.h"
@@ -86,7 +85,7 @@ void ADdGameplayPlayerController::BeginPlay()
 		return;
 	}
 
-	EnsureScreenFadeWidget();
+	InitializeSharedLocalControllerState();
 	EnsureResultPopupWidget();
 
 	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
@@ -193,48 +192,6 @@ void ADdGameplayPlayerController::RegisterGameplayMappingContexts()
 	{
 		InputSubsystem->RemoveMappingContext(GameplayUtilityMappingContext);
 		InputSubsystem->AddMappingContext(GameplayUtilityMappingContext, 1);
-	}
-}
-
-void ADdGameplayPlayerController::EnsureScreenFadeWidget()
-{
-	if (!IsLocalController())
-	{
-		return;
-	}
-
-	if (ScreenFadeWidget == nullptr)
-	{
-		TArray<UUserWidget*> FoundWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, FoundWidgets, UDdScreenFadeWidget::StaticClass(), false);
-
-		for (UUserWidget* FoundWidget : FoundWidgets)
-		{
-			if (UDdScreenFadeWidget* ExistingFadeWidget = Cast<UDdScreenFadeWidget>(FoundWidget))
-			{
-				ScreenFadeWidget = ExistingFadeWidget;
-				break;
-			}
-		}
-	}
-
-	if (ScreenFadeWidget != nullptr)
-	{
-		return;
-	}
-
-	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
-	UClass* ScreenFadeWidgetClass = Settings != nullptr ? Settings->ScreenFadeWidgetClass.LoadSynchronous() : nullptr;
-	if (ScreenFadeWidgetClass == nullptr)
-	{
-		ScreenFadeWidgetClass = UDdScreenFadeWidget::StaticClass();
-	}
-
-	ScreenFadeWidget = CreateWidget<UDdScreenFadeWidget>(GetGameInstance(), ScreenFadeWidgetClass);
-	if (ScreenFadeWidget != nullptr)
-	{
-		ScreenFadeWidget->AddToViewport(1000);
-		ScreenFadeWidget->SetFadeAlpha(1.0f);
 	}
 }
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Engine/EngineBaseTypes.h"
-#include "GameFramework/PlayerController.h"
+#include "DdBasePlayerController.h"
 #include "DdTitlePlayerController.generated.h"
 
 class UNetDriver;
 
 UCLASS()
-class DDPROJECT_API ADdTitlePlayerController : public APlayerController
+class DDPROJECT_API ADdTitlePlayerController : public ADdBasePlayerController
 {
 	GENERATED_BODY()
 
@@ -24,8 +24,8 @@ private:
 		Join
 	};
 
+	void BindScreenFadeWidgetEvents();
 	void ConfigureTitleInput();
-	void EnsureScreenFadeWidget();
 	void HandleScreenFadeFinished();
 	void ShowTitleScreen();
 	void EnterSingleGame();
@@ -44,9 +44,6 @@ private:
 
 	UPROPERTY()
 	class UDdTitleScreenWidget* TitleScreenWidget;
-
-	UPROPERTY()
-	class UDdScreenFadeWidget* ScreenFadeWidget;
 
 	bool bIsTransitioning = false;
 	bool bExecuteTitleActionWhenFadeCompletes = false;

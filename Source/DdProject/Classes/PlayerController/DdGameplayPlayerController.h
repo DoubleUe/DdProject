@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GameFramework/PlayerController.h"
+#include "DdBasePlayerController.h"
 #include "DdGameplayPlayerController.generated.h"
 
 UCLASS()
-class DDPROJECT_API ADdGameplayPlayerController : public APlayerController
+class DDPROJECT_API ADdGameplayPlayerController : public ADdBasePlayerController
 {
 	GENERATED_BODY()
 
@@ -23,7 +23,6 @@ private:
 	void ConfigureGameplayInput();
 	void RefreshInputMode();
 	void RegisterGameplayMappingContexts();
-	void EnsureScreenFadeWidget();
 	void EnsureResultPopupWidget();
 	void ToggleResultPopup();
 	void CloseResultPopup();
@@ -31,9 +30,6 @@ private:
 	void BeginTemporaryCursorMode();
 	void EndTemporaryCursorMode();
 	bool IsResultPopupOpen() const;
-
-	UPROPERTY()
-	class UDdScreenFadeWidget* ScreenFadeWidget;
 
 	UPROPERTY()
 	class UDdResultPopupWidget* ResultPopupWidget;
