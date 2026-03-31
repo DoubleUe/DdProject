@@ -2,20 +2,20 @@
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "../Network/DdSessionSubsystem.h"
 #include "../UI/Title/DdScreenFadeWidget.h"
 #include "../UI/Title/DdTitleScreenSettings.h"
 #include "../UI/Title/DdTitleScreenWidget.h"
 
+namespace
+{
+	constexpr TCHAR ListenOption[] = TEXT("listen");
+	constexpr TCHAR AllowJoinOption[] = TEXT("AllowClientJoin=");
+	constexpr TCHAR LocalHostAddress[] = TEXT("127.0.0.1");
+}
+
 void ADdTitlePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (UDdSessionSubsystem* SessionSubsystem = GetSessionSubsystem())
-	{
-		SessionSubsystem->OnSessionRequestFailed.RemoveAll(this);
-		SessionSubsystem->OnSessionRequestFailed.AddUObject(this, &ADdTitlePlayerController::HandleSessionRequestFailed);
-	}
 
 	EnsureScreenFadeWidget();
 
@@ -26,16 +26,6 @@ void ADdTitlePlayerController::BeginPlay()
 	}
 
 	ShowTitleScreen();
-}
-
-void ADdTitlePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (UDdSessionSubsystem* SessionSubsystem = GetSessionSubsystem())
-	{
-		SessionSubsystem->OnSessionRequestFailed.RemoveAll(this);
-	}
-
-	Super::EndPlay(EndPlayReason);
 }
 
 void ADdTitlePlayerController::ConfigureTitleInput()
@@ -128,31 +118,31 @@ void ADdTitlePlayerController::ShowTitleScreen()
 
 void ADdTitlePlayerController::HandleScreenFadeFinished()
 {
-	if (!bExecuteSessionActionWhenFadeCompletes)
+	if (!bExecuteTitleActionWhenFadeCompletes)
 	{
 		return;
 	}
 
-	bExecuteSessionActionWhenFadeCompletes = false;
-	GetWorldTimerManager().SetTimerForNextTick(this, &ADdTitlePlayerController::ExecutePendingSessionAction);
+	bExecuteTitleActionWhenFadeCompletes = false;
+	GetWorldTimerManager().SetTimerForNextTick(this, &ADdTitlePlayerController::ExecutePendingTitleAction);
 }
 
 void ADdTitlePlayerController::EnterSingleGame()
 {
-	StartSessionAction(ETitleSessionAction::Single);
+	StartTitleAction(ETitleAction::Single);
 }
 
 void ADdTitlePlayerController::EnterHostGame()
 {
-	StartSessionAction(ETitleSessionAction::Host);
+	StartTitleAction(ETitleAction::Host);
 }
 
 void ADdTitlePlayerController::EnterJoinGame()
 {
-	StartSessionAction(ETitleSessionAction::Join);
+	StartTitleAction(ETitleAction::Join);
 }
 
-void ADdTitlePlayerController::StartSessionAction(ETitleSessionAction InAction)
+void ADdTitlePlayerController::StartTitleAction(ETitleAction InAction)
 {
 	if (bIsTransitioning)
 	{
@@ -165,89 +155,82 @@ void ADdTitlePlayerController::StartSessionAction(ETitleSessionAction InAction)
 		return;
 	}
 
-	if (InAction != ETitleSessionAction::Single && GetSessionSubsystem() == nullptr)
-	{
-		return;
-	}
-
 	bIsTransitioning = true;
-	PendingSessionAction = InAction;
+	PendingTitleAction = InAction;
 	SetTitleScreenInteractivity(false);
 	EnsureScreenFadeWidget();
 
 	const float FadeOutDuration = FMath::Max(Settings->FadeOutDuration, 0.0f);
 	if (ScreenFadeWidget != nullptr && FadeOutDuration > KINDA_SMALL_NUMBER)
 	{
-		bExecuteSessionActionWhenFadeCompletes = true;
+		bExecuteTitleActionWhenFadeCompletes = true;
 		ScreenFadeWidget->StartFade(ScreenFadeWidget->GetFadeAlpha(), 1.0f, FadeOutDuration);
 		return;
 	}
 
-	ExecutePendingSessionAction();
+	ExecutePendingTitleAction();
 }
 
-void ADdTitlePlayerController::ExecutePendingSessionAction()
+void ADdTitlePlayerController::ExecutePendingTitleAction()
 {
 	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (Settings == nullptr)
 	{
-		HandleSessionRequestFailed(TEXT("Session subsystem is unavailable."));
+		HandleTitleActionFailed(TEXT("Title settings are unavailable."));
 		return;
 	}
 
-	switch (PendingSessionAction)
+	switch (PendingTitleAction)
 	{
-	case ETitleSessionAction::Single:
-		OpenSinglePlayerLevel();
+	case ETitleAction::Single:
+		OpenHostedLevel(false);
+		return;
+	case ETitleAction::Host:
+		OpenHostedLevel(true);
+		return;
+	case ETitleAction::Join:
+		JoinLocalHost();
 		return;
 	default:
 		break;
 	}
 
-	UDdSessionSubsystem* SessionSubsystem = GetSessionSubsystem();
-	if (SessionSubsystem == nullptr)
-	{
-		HandleSessionRequestFailed(TEXT("Session subsystem is unavailable."));
-		return;
-	}
-
-	bool bRequestStarted = false;
-	switch (PendingSessionAction)
-	{
-	case ETitleSessionAction::Host:
-		bRequestStarted = SessionSubsystem->HostSession(Settings->GameLevelName);
-		break;
-	case ETitleSessionAction::Join:
-		bRequestStarted = SessionSubsystem->JoinFirstAvailableSession();
-		break;
-	}
-
-	if (!bRequestStarted)
-	{
-		HandleSessionRequestFailed(TEXT("Failed to start the session request."));
-	}
+	HandleTitleActionFailed(TEXT("The requested title action is invalid."));
 }
 
-void ADdTitlePlayerController::OpenSinglePlayerLevel()
+void ADdTitlePlayerController::OpenHostedLevel(const bool bAllowClientJoin)
 {
 	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
 	if (Settings == nullptr || Settings->GameLevelName.IsNone())
 	{
-		HandleSessionRequestFailed(TEXT("Single-player travel target is invalid."));
+		HandleTitleActionFailed(TEXT("Gameplay level travel target is invalid."));
 		return;
 	}
 
-	PendingSessionAction = ETitleSessionAction::None;
-	UGameplayStatics::OpenLevel(this, Settings->GameLevelName);
+	PendingTitleAction = ETitleAction::None;
+
+	const FString TravelOptions = FString::Printf(
+		TEXT("%s?%s%s"),
+		ListenOption,
+		AllowJoinOption,
+		bAllowClientJoin ? TEXT("1") : TEXT("0"));
+
+	UGameplayStatics::OpenLevel(this, Settings->GameLevelName, true, TravelOptions);
 }
 
-void ADdTitlePlayerController::HandleSessionRequestFailed(const FString& ErrorMessage)
+void ADdTitlePlayerController::JoinLocalHost()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Title session request failed: %s"), *ErrorMessage);
+	PendingTitleAction = ETitleAction::None;
+	ClientTravel(LocalHostAddress, TRAVEL_Absolute);
+}
+
+void ADdTitlePlayerController::HandleTitleActionFailed(const FString& ErrorMessage)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Title action failed: %s"), *ErrorMessage);
 
 	bIsTransitioning = false;
-	bExecuteSessionActionWhenFadeCompletes = false;
-	PendingSessionAction = ETitleSessionAction::None;
+	bExecuteTitleActionWhenFadeCompletes = false;
+	PendingTitleAction = ETitleAction::None;
 	SetTitleScreenInteractivity(true);
 
 	const UDdTitleScreenSettings* Settings = GetDefault<UDdTitleScreenSettings>();
@@ -277,10 +260,4 @@ void ADdTitlePlayerController::SetTitleScreenInteractivity(bool bIsEnabled)
 	bShowMouseCursor = false;
 	bEnableClickEvents = false;
 	bEnableMouseOverEvents = false;
-}
-
-UDdSessionSubsystem* ADdTitlePlayerController::GetSessionSubsystem() const
-{
-	UGameInstance* GameInstance = GetGameInstance();
-	return GameInstance != nullptr ? GameInstance->GetSubsystem<UDdSessionSubsystem>() : nullptr;
 }
