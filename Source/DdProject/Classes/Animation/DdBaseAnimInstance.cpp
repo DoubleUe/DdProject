@@ -9,6 +9,7 @@ void UDdBaseAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	CacheOwnerComponents();
+	UpdateMovementState();
 }
 
 void UDdBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -16,19 +17,40 @@ void UDdBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	CacheOwnerComponents();
+	UpdateMovementState();
 }
 
 void UDdBaseAnimInstance::CacheOwnerComponents()
 {
 	ADdBaseCharacter* BaseCharacter = Cast<ADdBaseCharacter>(TryGetPawnOwner());
 
-	if (!BaseCharacter)
+	if (!IsValid(BaseCharacter))
 	{
 		TrajectoryComponent = nullptr;
 		CharacterMovementComponent = nullptr;
 		return;
 	}
 
-	TrajectoryComponent = BaseCharacter->GetTrajectoryComponent();
-	CharacterMovementComponent = BaseCharacter->GetCharacterMovement();
+	if (!IsValid(TrajectoryComponent))
+	{
+		TrajectoryComponent = BaseCharacter->GetTrajectoryComponent();
+	}
+
+	if (!IsValid(CharacterMovementComponent))
+	{
+		CharacterMovementComponent = BaseCharacter->GetCharacterMovement();
+	}
+}
+
+void UDdBaseAnimInstance::UpdateMovementState()
+{
+	if (!IsValid(CharacterMovementComponent))
+	{
+		Speed = 0.0f;
+		bIsFalling = false;
+		return;
+	}
+
+	Speed = CharacterMovementComponent->Velocity.Size();
+	bIsFalling = CharacterMovementComponent->IsFalling();
 }
