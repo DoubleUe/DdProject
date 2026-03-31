@@ -1,7 +1,11 @@
 #include "DdTitlePlayerController.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "SocketSubsystem.h"
+#include "Sockets.h"
 #include "../UI/Title/DdScreenFadeWidget.h"
 #include "../UI/Title/DdTitleScreenSettings.h"
 #include "../UI/Title/DdTitleScreenWidget.h"
@@ -11,11 +15,18 @@ namespace
 	constexpr TCHAR ListenOption[] = TEXT("listen");
 	constexpr TCHAR AllowJoinOption[] = TEXT("AllowClientJoin=");
 	constexpr TCHAR LocalHostAddress[] = TEXT("127.0.0.1");
+	constexpr int32 DefaultListenPort = 7777;
 }
 
 void ADdTitlePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (GEngine != nullptr)
+	{
+		GEngine->OnNetworkFailure().RemoveAll(this);
+		GEngine->OnNetworkFailure().AddUObject(this, &ADdTitlePlayerController::HandleNetworkFailure);
+	}
 
 	EnsureScreenFadeWidget();
 
@@ -26,6 +37,16 @@ void ADdTitlePlayerController::BeginPlay()
 	}
 
 	ShowTitleScreen();
+}
+
+void ADdTitlePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (GEngine != nullptr)
+	{
+		GEngine->OnNetworkFailure().RemoveAll(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void ADdTitlePlayerController::ConfigureTitleInput()
@@ -155,6 +176,13 @@ void ADdTitlePlayerController::StartTitleAction(ETitleAction InAction)
 		return;
 	}
 
+	FString ErrorMessage;
+	if (!CanStartTitleAction(InAction, ErrorMessage))
+	{
+		HandleTitleActionFailed(ErrorMessage);
+		return;
+	}
+
 	bIsTransitioning = true;
 	PendingTitleAction = InAction;
 	SetTitleScreenInteractivity(false);
@@ -224,9 +252,103 @@ void ADdTitlePlayerController::JoinLocalHost()
 	ClientTravel(LocalHostAddress, TRAVEL_Absolute);
 }
 
+bool ADdTitlePlayerController::CanStartTitleAction(const ETitleAction InAction, FString& OutErrorMessage) const
+{
+	switch (InAction)
+	{
+	case ETitleAction::Single:
+	case ETitleAction::Host:
+		if (!IsLocalHostPortAvailable(DefaultListenPort))
+		{
+			OutErrorMessage = FString::Printf(TEXT("Port %d is already in use."), DefaultListenPort);
+			return false;
+		}
+		return true;
+	case ETitleAction::Join:
+		if (IsLocalHostPortAvailable(DefaultListenPort))
+		{
+			OutErrorMessage = FString::Printf(TEXT("No host is listening on %s:%d."), LocalHostAddress, DefaultListenPort);
+			return false;
+		}
+		return true;
+	default:
+		return true;
+	}
+}
+
+bool ADdTitlePlayerController::IsLocalHostPortAvailable(const int32 InPort) const
+{
+	ISocketSubsystem* const SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	if (SocketSubsystem == nullptr)
+	{
+		return false;
+	}
+
+	FSocket* const TestSocket = SocketSubsystem->CreateSocket(NAME_DGram, TEXT("DdTitlePortAvailabilityCheck"), false);
+	if (TestSocket == nullptr)
+	{
+		return false;
+	}
+
+	TSharedRef<FInternetAddr> BindAddress = SocketSubsystem->CreateInternetAddr();
+	BindAddress->SetAnyAddress();
+	BindAddress->SetPort(InPort);
+
+	const bool bWasAvailable = TestSocket->Bind(*BindAddress);
+
+	TestSocket->Close();
+	SocketSubsystem->DestroySocket(TestSocket);
+	return bWasAvailable;
+}
+
+void ADdTitlePlayerController::ShowTitleErrorMessage(const FString& ErrorMessage) const
+{
+	UKismetSystemLibrary::PrintString(this, ErrorMessage, true, true, FLinearColor::Red, 5.0f);
+}
+
+void ADdTitlePlayerController::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, const ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	FString FailureMessage = ErrorString;
+	if (FailureMessage.IsEmpty())
+	{
+		switch (FailureType)
+		{
+		case ENetworkFailure::ConnectionLost:
+			FailureMessage = TEXT("Connection lost.");
+			break;
+		case ENetworkFailure::ConnectionTimeout:
+			FailureMessage = TEXT("Connection timed out.");
+			break;
+		case ENetworkFailure::FailureReceived:
+			FailureMessage = TEXT("A network failure was received from the host.");
+			break;
+		case ENetworkFailure::PendingConnectionFailure:
+			FailureMessage = TEXT("Failed to connect to the host.");
+			break;
+		case ENetworkFailure::NetGuidMismatch:
+			FailureMessage = TEXT("Network GUID mismatch.");
+			break;
+		case ENetworkFailure::NetChecksumMismatch:
+			FailureMessage = TEXT("Network checksum mismatch.");
+			break;
+		default:
+			FailureMessage = TEXT("A network failure occurred.");
+			break;
+		}
+	}
+
+	HandleTitleActionFailed(FailureMessage);
+}
+
 void ADdTitlePlayerController::HandleTitleActionFailed(const FString& ErrorMessage)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Title action failed: %s"), *ErrorMessage);
+	ShowTitleErrorMessage(ErrorMessage);
 
 	bIsTransitioning = false;
 	bExecuteTitleActionWhenFadeCompletes = false;

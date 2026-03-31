@@ -81,6 +81,11 @@ void ADdGameplayPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	EnsureScreenFadeWidget();
 	EnsureResultPopupWidget();
 
@@ -96,6 +101,11 @@ void ADdGameplayPlayerController::BeginPlay()
 void ADdGameplayPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+	if (!IsLocalController())
+	{
+		return;
+	}
 
 	if (InputComponent != nullptr)
 	{
@@ -116,6 +126,11 @@ void ADdGameplayPlayerController::ConfigureGameplayInput()
 
 void ADdGameplayPlayerController::RefreshInputMode()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (IsResultPopupOpen())
 	{
 		FInputModeGameAndUI InputMode;
@@ -183,6 +198,11 @@ void ADdGameplayPlayerController::RegisterGameplayMappingContexts()
 
 void ADdGameplayPlayerController::EnsureScreenFadeWidget()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (ScreenFadeWidget == nullptr)
 	{
 		TArray<UUserWidget*> FoundWidgets;
@@ -220,6 +240,11 @@ void ADdGameplayPlayerController::EnsureScreenFadeWidget()
 
 void ADdGameplayPlayerController::EnsureResultPopupWidget()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (ResultPopupWidget != nullptr)
 	{
 		return;
@@ -246,6 +271,11 @@ void ADdGameplayPlayerController::EnsureResultPopupWidget()
 
 void ADdGameplayPlayerController::ToggleResultPopup()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	EnsureResultPopupWidget();
 	if (ResultPopupWidget == nullptr)
 	{
@@ -265,6 +295,11 @@ void ADdGameplayPlayerController::ToggleResultPopup()
 
 void ADdGameplayPlayerController::CloseResultPopup()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (ResultPopupWidget == nullptr)
 	{
 		return;
@@ -281,6 +316,11 @@ void ADdGameplayPlayerController::HandleResultPopupClosed()
 
 void ADdGameplayPlayerController::BeginTemporaryCursorMode()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (bTemporaryCursorModeActive)
 	{
 		return;
@@ -292,6 +332,11 @@ void ADdGameplayPlayerController::BeginTemporaryCursorMode()
 
 void ADdGameplayPlayerController::EndTemporaryCursorMode()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
 	if (!bTemporaryCursorModeActive)
 	{
 		return;
