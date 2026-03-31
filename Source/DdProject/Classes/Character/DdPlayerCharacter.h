@@ -28,6 +28,7 @@ private:
 	void CameraZoom(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void ToggleRotationMode();
 	void Attack();
 	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();

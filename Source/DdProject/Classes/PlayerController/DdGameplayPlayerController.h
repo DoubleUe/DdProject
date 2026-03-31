@@ -12,6 +12,7 @@ public:
 	ADdGameplayPlayerController();
 	const class UInputAction* GetGameplayAttackAction() const { return GameplayAttackAction; }
 	const class UInputAction* GetGameplayCameraZoomAction() const { return GameplayCameraZoomAction; }
+	const class UInputAction* GetGameplayToggleRotationModeAction() const { return GameplayToggleRotationModeAction; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,6 +51,9 @@ private:
 
 	UPROPERTY()
 	class UInputAction* GameplayCameraZoomAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayToggleRotationModeAction;
 
 	UPROPERTY()
 	bool bTemporaryCursorModeActive = false;

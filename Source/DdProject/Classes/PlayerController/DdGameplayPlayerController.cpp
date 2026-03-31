@@ -18,6 +18,7 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 	GameplayUtilityMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("GameplayUtilityMappingContext"));
 	GameplayAttackAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayAttackAction"));
 	GameplayCameraZoomAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayCameraZoomAction"));
+	GameplayToggleRotationModeAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleRotationModeAction"));
 
 	if (GameplayAttackAction != nullptr)
 	{
@@ -27,6 +28,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 	if (GameplayCameraZoomAction != nullptr)
 	{
 		GameplayCameraZoomAction->ValueType = EInputActionValueType::Axis1D;
+	}
+
+	if (GameplayToggleRotationModeAction != nullptr)
+	{
+		GameplayToggleRotationModeAction->ValueType = EInputActionValueType::Boolean;
 	}
 
 	if (GameplayUtilityMappingContext != nullptr)
@@ -39,6 +45,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 		if (GameplayCameraZoomAction != nullptr)
 		{
 			GameplayUtilityMappingContext->MapKey(GameplayCameraZoomAction, EKeys::MouseWheelAxis);
+		}
+
+		if (GameplayToggleRotationModeAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayToggleRotationModeAction, EKeys::R);
 		}
 	}
 

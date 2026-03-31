@@ -115,6 +115,11 @@ void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		{
 			EnhancedInputComponent->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::CameraZoom);
 		}
+
+		if (const UInputAction* ToggleRotationModeAction = GameplayPlayerController->GetGameplayToggleRotationModeAction())
+		{
+			EnhancedInputComponent->BindAction(ToggleRotationModeAction, ETriggerEvent::Started, this, &ADdPlayerCharacter::ToggleRotationMode);
+		}
 	}
 }
 
@@ -126,6 +131,20 @@ void ADdPlayerCharacter::Tick(float DeltaSeconds)
 	{
 		PlayerCameraComp->UpdateCameraZoom(DeltaSeconds);
 	}
+}
+
+void ADdPlayerCharacter::ToggleRotationMode()
+{
+	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
+	if (CharacterMovementComponent == nullptr)
+	{
+		return;
+	}
+
+	const bool bUseControllerDesiredRotation = CharacterMovementComponent->bOrientRotationToMovement;
+
+	CharacterMovementComponent->bOrientRotationToMovement = !bUseControllerDesiredRotation;
+	CharacterMovementComponent->bUseControllerDesiredRotation = bUseControllerDesiredRotation;
 }
 
 void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
