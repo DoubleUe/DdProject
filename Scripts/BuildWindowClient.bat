@@ -12,6 +12,8 @@ set "LOG_DIR=%SCRIPT_DIR%Logs"
 set "BUILD_CONFIG=DebugGame"
 set "TARGET_PLATFORM=Win64"
 set "BUILD_EXIT_CODE=1"
+set "PACKAGED_SAVED_DIR=%ARCHIVE_DIR%\Windows\DdProject\Saved"
+set "PACKAGED_USER_SETTINGS=%PACKAGED_SAVED_DIR%\Config\Windows\GameUserSettings.ini"
 
 if not exist "%LOG_DIR%" (
 	mkdir "%LOG_DIR%"
@@ -54,6 +56,12 @@ if not exist "%RUN_UAT%" (
 	echo.
 ) > "%LOG_FILE%"
 
+if exist "%PACKAGED_SAVED_DIR%" (
+	echo [Info] Removing stale packaged saved data: %PACKAGED_SAVED_DIR%
+	echo [Info] Removing stale packaged saved data: %PACKAGED_SAVED_DIR%>> "%LOG_FILE%"
+	rmdir /s /q "%PACKAGED_SAVED_DIR%"
+)
+
 echo [Info] Building and packaging DdProject to %ARCHIVE_DIR%
 echo [Info] Build log: %LOG_FILE%
 echo [Info] The command window will stay open after the build completes.
@@ -90,6 +98,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 	"exit $LASTEXITCODE"
 
 set "BUILD_EXIT_CODE=%ERRORLEVEL%"
+
+if exist "%PACKAGED_USER_SETTINGS%" (
+	echo [Info] Removing packaged GameUserSettings override: %PACKAGED_USER_SETTINGS%
+	echo [Info] Removing packaged GameUserSettings override: %PACKAGED_USER_SETTINGS%>> "%LOG_FILE%"
+	del /f /q "%PACKAGED_USER_SETTINGS%"
+)
 
 echo.>> "%LOG_FILE%"
 if "%BUILD_EXIT_CODE%"=="0" (
