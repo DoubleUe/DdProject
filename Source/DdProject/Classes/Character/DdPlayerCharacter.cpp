@@ -120,6 +120,11 @@ void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		{
 			EnhancedInputComponent->BindAction(ToggleRotationModeAction, ETriggerEvent::Started, this, &ADdBaseCharacter::ToggleRotationMode);
 		}
+
+		if (const UInputAction* ToggleWalkSpeedAction = GameplayPlayerController->GetGameplayToggleWalkSpeedAction())
+		{
+			EnhancedInputComponent->BindAction(ToggleWalkSpeedAction, ETriggerEvent::Started, this, &ADdBaseCharacter::ToggleWalkSpeed);
+		}
 	}
 }
 

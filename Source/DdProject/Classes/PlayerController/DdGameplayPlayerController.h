@@ -13,6 +13,7 @@ public:
 	const class UInputAction* GetGameplayAttackAction() const { return GameplayAttackAction; }
 	const class UInputAction* GetGameplayCameraZoomAction() const { return GameplayCameraZoomAction; }
 	const class UInputAction* GetGameplayToggleRotationModeAction() const { return GameplayToggleRotationModeAction; }
+	const class UInputAction* GetGameplayToggleWalkSpeedAction() const { return GameplayToggleWalkSpeedAction; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,6 +55,9 @@ private:
 
 	UPROPERTY()
 	class UInputAction* GameplayToggleRotationModeAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayToggleWalkSpeedAction;
 
 	UPROPERTY()
 	bool bTemporaryCursorModeActive = false;

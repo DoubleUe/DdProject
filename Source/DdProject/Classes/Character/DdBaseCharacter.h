@@ -20,10 +20,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement|Rotation")
 	void ToggleRotationMode();
 
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void ToggleWalkSpeed();
+
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
 	virtual void SetAttackInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackInputBlocked, );
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Trajectory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCharacterTrajectoryComponent> TrajectoryComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float NormalWalkSpeed = 500.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float SlowWalkSpeed = 250.0f;
+
+	UPROPERTY(Transient)
+	bool bUseSlowWalkSpeed = false;
 };

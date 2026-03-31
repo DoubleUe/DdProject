@@ -26,3 +26,15 @@ void ADdBaseCharacter::ToggleRotationMode()
 	CharacterMovementComponent->bOrientRotationToMovement = !bUseControllerDesiredRotation;
 	CharacterMovementComponent->bUseControllerDesiredRotation = bUseControllerDesiredRotation;
 }
+
+void ADdBaseCharacter::ToggleWalkSpeed()
+{
+	UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
+	if (CharacterMovementComponent == nullptr)
+	{
+		return;
+	}
+
+	bUseSlowWalkSpeed = !bUseSlowWalkSpeed;
+	CharacterMovementComponent->MaxWalkSpeed = bUseSlowWalkSpeed ? SlowWalkSpeed : NormalWalkSpeed;
+}

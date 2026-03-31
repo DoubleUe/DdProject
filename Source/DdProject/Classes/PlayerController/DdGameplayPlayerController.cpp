@@ -19,6 +19,7 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 	GameplayAttackAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayAttackAction"));
 	GameplayCameraZoomAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayCameraZoomAction"));
 	GameplayToggleRotationModeAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleRotationModeAction"));
+	GameplayToggleWalkSpeedAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleWalkSpeedAction"));
 
 	if (GameplayAttackAction != nullptr)
 	{
@@ -33,6 +34,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 	if (GameplayToggleRotationModeAction != nullptr)
 	{
 		GameplayToggleRotationModeAction->ValueType = EInputActionValueType::Boolean;
+	}
+
+	if (GameplayToggleWalkSpeedAction != nullptr)
+	{
+		GameplayToggleWalkSpeedAction->ValueType = EInputActionValueType::Boolean;
 	}
 
 	if (GameplayUtilityMappingContext != nullptr)
@@ -50,6 +56,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 		if (GameplayToggleRotationModeAction != nullptr)
 		{
 			GameplayUtilityMappingContext->MapKey(GameplayToggleRotationModeAction, EKeys::R);
+		}
+
+		if (GameplayToggleWalkSpeedAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayToggleWalkSpeedAction, EKeys::LeftControl);
 		}
 	}
 
