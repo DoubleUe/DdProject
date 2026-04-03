@@ -34,8 +34,8 @@ private:
 	void ToggleResultPopup();
 	void CloseResultPopup();
 	void HandleResultPopupClosed();
-	void BeginTemporaryCursorMode();
-	void EndTemporaryCursorMode();
+	void BeginFreeCursorMode();
+	void EndFreeCursorMode();
 	class ADdPlayerCharacter* GetControlledPlayerCharacter() const;
 	class ADdBaseCharacter* GetControlledBaseCharacter() const;
 	bool IsResultPopupOpen() const;
@@ -77,8 +77,8 @@ private:
 	class UInputAction* GameplayToggleResultPopupAction;
 
 	UPROPERTY()
-	class UInputAction* GameplayTemporaryCursorAction;
+	class UInputAction* GameplayFreeCursorAction;
 
 	UPROPERTY()
-	bool bTemporaryCursorModeActive = false;
+	bool bFreeCursorModeActive = false;
 };
