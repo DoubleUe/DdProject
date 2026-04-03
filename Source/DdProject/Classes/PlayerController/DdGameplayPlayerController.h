@@ -3,6 +3,8 @@
 #include "DdBasePlayerController.h"
 #include "DdGameplayPlayerController.generated.h"
 
+struct FInputActionValue;
+
 UCLASS()
 class DDPROJECT_API ADdGameplayPlayerController : public ADdBasePlayerController
 {
@@ -10,10 +12,6 @@ class DDPROJECT_API ADdGameplayPlayerController : public ADdBasePlayerController
 
 public:
 	ADdGameplayPlayerController();
-	const class UInputAction* GetGameplayAttackAction() const { return GameplayAttackAction; }
-	const class UInputAction* GetGameplayCameraZoomAction() const { return GameplayCameraZoomAction; }
-	const class UInputAction* GetGameplayToggleRotationModeAction() const { return GameplayToggleRotationModeAction; }
-	const class UInputAction* GetGameplayToggleWalkSpeedAction() const { return GameplayToggleWalkSpeedAction; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -23,12 +21,23 @@ private:
 	void ConfigureGameplayInput();
 	void RefreshInputMode();
 	void RegisterGameplayMappingContexts();
+	void BindGameplayInputActions(class UEnhancedInputComponent* EnhancedInputComponent);
 	void EnsureResultPopupWidget();
+	void HandleJumpStarted();
+	void HandleJumpCompleted();
+	void HandleMoveTriggered(const FInputActionValue& Value);
+	void HandleLookTriggered(const FInputActionValue& Value);
+	void HandleAttackStarted();
+	void HandleCameraZoomTriggered(const FInputActionValue& Value);
+	void HandleToggleRotationModeStarted();
+	void HandleToggleWalkSpeedStarted();
 	void ToggleResultPopup();
 	void CloseResultPopup();
 	void HandleResultPopupClosed();
 	void BeginTemporaryCursorMode();
 	void EndTemporaryCursorMode();
+	class ADdPlayerCharacter* GetControlledPlayerCharacter() const;
+	class ADdBaseCharacter* GetControlledBaseCharacter() const;
 	bool IsResultPopupOpen() const;
 
 	UPROPERTY()
@@ -44,6 +53,15 @@ private:
 	class UInputMappingContext* GameplayUtilityMappingContext;
 
 	UPROPERTY()
+	class UInputAction* GameplayJumpAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayMoveAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayLookAction;
+
+	UPROPERTY()
 	class UInputAction* GameplayAttackAction;
 
 	UPROPERTY()
@@ -54,6 +72,12 @@ private:
 
 	UPROPERTY()
 	class UInputAction* GameplayToggleWalkSpeedAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayToggleResultPopupAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayTemporaryCursorAction;
 
 	UPROPERTY()
 	bool bTemporaryCursorModeActive = false;

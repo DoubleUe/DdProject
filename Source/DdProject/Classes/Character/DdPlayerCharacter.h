@@ -6,7 +6,6 @@
 #include "DdPlayerCharacter.generated.h"
 
 class UAnimSequenceBase;
-class UInputAction;
 class UDdPlayerCameraComponent;
 struct FInputActionValue;
 
@@ -19,34 +18,22 @@ public:
 	ADdPlayerCharacter();
 	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
 	virtual void SetAttackInputBlocked(bool bBlocked) override;
+	void ApplyCameraZoomInput(const FInputActionValue& Value);
+	void ApplyMoveInput(const FInputActionValue& Value);
+	void ApplyLookInput(const FInputActionValue& Value);
+	void TryAttack();
 
 protected:
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
 
 private:
-	void CameraZoom(const FInputActionValue& Value);
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void Attack();
-	void TryBlendToMovementAnimation();
 	void FinishAttackAnimation();
-	bool CanProcessMovementInput() const;
 	bool CanProcessAttackInput() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDdPlayerCameraComponent> PlayerCameraComp;
 
-	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UInputAction> JumpAction;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UInputAction> MoveAction;
-
-	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditDefaultsOnly, Category="Animation", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimSequenceBase> AttackAnimation;
 
 	UPROPERTY()
@@ -55,10 +42,7 @@ private:
 	UPROPERTY()
 	bool bAttackMovementInputBlocked = true;
 
-	UPROPERTY()
-	bool bCanTransitionFromAttackToMovement = false;
-
-	// 공격 입력 차단 플래그 (노티파이에 의해 제어)
+	// Controlled by animation notify states to gate attack input windows.
 	UPROPERTY()
 	bool bAttackInputBlocked = true;
 

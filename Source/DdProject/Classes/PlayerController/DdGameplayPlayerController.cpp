@@ -1,5 +1,6 @@
 #include "DdGameplayPlayerController.h"
 
+#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputAction.h"
@@ -7,6 +8,8 @@
 #include "InputMappingContext.h"
 #include "InputCoreTypes.h"
 #include "UObject/ConstructorHelpers.h"
+#include "../Character/DdBaseCharacter.h"
+#include "../Character/DdPlayerCharacter.h"
 #include "../UI/Gameplay/DdResultPopupSettings.h"
 #include "../UI/Gameplay/DdResultPopupWidget.h"
 #include "../UI/Title/DdScreenFadeWidget.h"
@@ -15,10 +18,40 @@
 ADdGameplayPlayerController::ADdGameplayPlayerController()
 {
 	GameplayUtilityMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("GameplayUtilityMappingContext"));
+	GameplayToggleResultPopupAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleResultPopupAction"));
+	GameplayTemporaryCursorAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayTemporaryCursorAction"));
 	GameplayAttackAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayAttackAction"));
 	GameplayCameraZoomAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayCameraZoomAction"));
 	GameplayToggleRotationModeAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleRotationModeAction"));
 	GameplayToggleWalkSpeedAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleWalkSpeedAction"));
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Design/Input/Actions/IA_Jump.IA_Jump"));
+	if (JumpActionAsset.Succeeded())
+	{
+		GameplayJumpAction = JumpActionAsset.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Design/Input/Actions/IA_Move.IA_Move"));
+	if (MoveActionAsset.Succeeded())
+	{
+		GameplayMoveAction = MoveActionAsset.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Design/Input/Actions/IA_Look.IA_Look"));
+	if (LookActionAsset.Succeeded())
+	{
+		GameplayLookAction = LookActionAsset.Object;
+	}
+
+	if (GameplayToggleResultPopupAction != nullptr)
+	{
+		GameplayToggleResultPopupAction->ValueType = EInputActionValueType::Boolean;
+	}
+
+	if (GameplayTemporaryCursorAction != nullptr)
+	{
+		GameplayTemporaryCursorAction->ValueType = EInputActionValueType::Boolean;
+	}
 
 	if (GameplayAttackAction != nullptr)
 	{
@@ -60,6 +93,17 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 		if (GameplayToggleWalkSpeedAction != nullptr)
 		{
 			GameplayUtilityMappingContext->MapKey(GameplayToggleWalkSpeedAction, EKeys::LeftControl);
+		}
+
+		if (GameplayToggleResultPopupAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayToggleResultPopupAction, EKeys::LeftBracket);
+		}
+
+		if (GameplayTemporaryCursorAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayTemporaryCursorAction, EKeys::LeftAlt);
+			GameplayUtilityMappingContext->MapKey(GameplayTemporaryCursorAction, EKeys::RightAlt);
 		}
 	}
 
@@ -106,14 +150,13 @@ void ADdGameplayPlayerController::SetupInputComponent()
 		return;
 	}
 
-	if (InputComponent != nullptr)
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	if (EnhancedInputComponent == nullptr)
 	{
-		InputComponent->BindKey(EKeys::LeftBracket, IE_Pressed, this, &ADdGameplayPlayerController::ToggleResultPopup);
-		InputComponent->BindKey(EKeys::LeftAlt, IE_Pressed, this, &ADdGameplayPlayerController::BeginTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::LeftAlt, IE_Released, this, &ADdGameplayPlayerController::EndTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::RightAlt, IE_Pressed, this, &ADdGameplayPlayerController::BeginTemporaryCursorMode);
-		InputComponent->BindKey(EKeys::RightAlt, IE_Released, this, &ADdGameplayPlayerController::EndTemporaryCursorMode);
+		return;
 	}
+
+	BindGameplayInputActions(EnhancedInputComponent);
 }
 
 void ADdGameplayPlayerController::ConfigureGameplayInput()
@@ -121,6 +164,125 @@ void ADdGameplayPlayerController::ConfigureGameplayInput()
 	bTemporaryCursorModeActive = false;
 	RefreshInputMode();
 	RegisterGameplayMappingContexts();
+}
+
+void ADdGameplayPlayerController::BindGameplayInputActions(UEnhancedInputComponent* EnhancedInputComponent)
+{
+	if (EnhancedInputComponent == nullptr)
+	{
+		return;
+	}
+
+	if (GameplayJumpAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayJumpAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::HandleJumpStarted);
+		EnhancedInputComponent->BindAction(GameplayJumpAction, ETriggerEvent::Completed, this, &ADdGameplayPlayerController::HandleJumpCompleted);
+	}
+
+	if (GameplayMoveAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayMoveAction, ETriggerEvent::Triggered, this, &ADdGameplayPlayerController::HandleMoveTriggered);
+	}
+
+	if (GameplayLookAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayLookAction, ETriggerEvent::Triggered, this, &ADdGameplayPlayerController::HandleLookTriggered);
+	}
+
+	if (GameplayAttackAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayAttackAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::HandleAttackStarted);
+	}
+
+	if (GameplayCameraZoomAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayCameraZoomAction, ETriggerEvent::Triggered, this, &ADdGameplayPlayerController::HandleCameraZoomTriggered);
+	}
+
+	if (GameplayToggleRotationModeAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayToggleRotationModeAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::HandleToggleRotationModeStarted);
+	}
+
+	if (GameplayToggleWalkSpeedAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayToggleWalkSpeedAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::HandleToggleWalkSpeedStarted);
+	}
+
+	if (GameplayToggleResultPopupAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayToggleResultPopupAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::ToggleResultPopup);
+	}
+
+	if (GameplayTemporaryCursorAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayTemporaryCursorAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::BeginTemporaryCursorMode);
+		EnhancedInputComponent->BindAction(GameplayTemporaryCursorAction, ETriggerEvent::Completed, this, &ADdGameplayPlayerController::EndTemporaryCursorMode);
+	}
+}
+
+void ADdGameplayPlayerController::HandleJumpStarted()
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->Jump();
+	}
+}
+
+void ADdGameplayPlayerController::HandleJumpCompleted()
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->StopJumping();
+	}
+}
+
+void ADdGameplayPlayerController::HandleMoveTriggered(const FInputActionValue& Value)
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->ApplyMoveInput(Value);
+	}
+}
+
+void ADdGameplayPlayerController::HandleLookTriggered(const FInputActionValue& Value)
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->ApplyLookInput(Value);
+	}
+}
+
+void ADdGameplayPlayerController::HandleAttackStarted()
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->TryAttack();
+	}
+}
+
+void ADdGameplayPlayerController::HandleCameraZoomTriggered(const FInputActionValue& Value)
+{
+	if (ADdPlayerCharacter* PlayerCharacter = GetControlledPlayerCharacter())
+	{
+		PlayerCharacter->ApplyCameraZoomInput(Value);
+	}
+}
+
+void ADdGameplayPlayerController::HandleToggleRotationModeStarted()
+{
+	if (ADdBaseCharacter* BaseCharacter = GetControlledBaseCharacter())
+	{
+		BaseCharacter->ToggleRotationMode();
+	}
+}
+
+void ADdGameplayPlayerController::HandleToggleWalkSpeedStarted()
+{
+	if (ADdBaseCharacter* BaseCharacter = GetControlledBaseCharacter())
+	{
+		BaseCharacter->ToggleWalkSpeed();
+	}
 }
 
 void ADdGameplayPlayerController::RefreshInputMode()
@@ -301,6 +463,16 @@ void ADdGameplayPlayerController::EndTemporaryCursorMode()
 
 	bTemporaryCursorModeActive = false;
 	RefreshInputMode();
+}
+
+ADdPlayerCharacter* ADdGameplayPlayerController::GetControlledPlayerCharacter() const
+{
+	return Cast<ADdPlayerCharacter>(GetPawn());
+}
+
+ADdBaseCharacter* ADdGameplayPlayerController::GetControlledBaseCharacter() const
+{
+	return Cast<ADdBaseCharacter>(GetPawn());
 }
 
 bool ADdGameplayPlayerController::IsResultPopupOpen() const

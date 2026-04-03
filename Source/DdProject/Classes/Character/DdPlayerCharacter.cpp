@@ -3,14 +3,11 @@
 #include "Animation/AnimSequenceBase.h"
 #include "Component/DdPlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
-#include "InputAction.h"
 #include "InputActionValue.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
-#include "../PlayerController/DdGameplayPlayerController.h"
 
 ADdPlayerCharacter::ADdPlayerCharacter()
 {
@@ -42,24 +39,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 		GetMesh()->SetSkeletalMesh(MeshAsset.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Design/Input/Actions/IA_Jump.IA_Jump"));
-	if (JumpActionAsset.Succeeded())
-	{
-		JumpAction = JumpActionAsset.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Design/Input/Actions/IA_Move.IA_Move"));
-	if (MoveActionAsset.Succeeded())
-	{
-		MoveAction = MoveActionAsset.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Design/Input/Actions/IA_Look.IA_Look"));
-	if (LookActionAsset.Succeeded())
-	{
-		LookAction = LookActionAsset.Object;
-	}
-
 	static ConstructorHelpers::FObjectFinder<UAnimSequenceBase> AttackAnimationAsset(TEXT("/Game/Characters/Player/Animations/Standing_Melee_Attack_Downward.Standing_Melee_Attack_Downward"));
 	if (AttackAnimationAsset.Succeeded())
 	{
@@ -70,62 +49,11 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 void ADdPlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 {
 	bAttackMovementInputBlocked = bBlocked;
-	bCanTransitionFromAttackToMovement = !bBlocked;
 }
 
 void ADdPlayerCharacter::SetAttackInputBlocked(bool bBlocked)
 {
 	bAttackInputBlocked = bBlocked;
-}
-
-void ADdPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (EnhancedInputComponent == nullptr)
-	{
-		return;
-	}
-
-	if (JumpAction != nullptr)
-	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-	}
-
-	if (MoveAction != nullptr)
-	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Move);
-	}
-
-	if (LookAction != nullptr)
-	{
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::Look);
-	}
-
-	if (const ADdGameplayPlayerController* GameplayPlayerController = Cast<ADdGameplayPlayerController>(GetController()))
-	{
-		if (const UInputAction* AttackAction = GameplayPlayerController->GetGameplayAttackAction())
-		{
-			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ADdPlayerCharacter::Attack);
-		}
-
-		if (const UInputAction* CameraZoomAction = GameplayPlayerController->GetGameplayCameraZoomAction())
-		{
-			EnhancedInputComponent->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &ADdPlayerCharacter::CameraZoom);
-		}
-
-		if (const UInputAction* ToggleRotationModeAction = GameplayPlayerController->GetGameplayToggleRotationModeAction())
-		{
-			EnhancedInputComponent->BindAction(ToggleRotationModeAction, ETriggerEvent::Started, this, &ADdBaseCharacter::ToggleRotationMode);
-		}
-
-		if (const UInputAction* ToggleWalkSpeedAction = GameplayPlayerController->GetGameplayToggleWalkSpeedAction())
-		{
-			EnhancedInputComponent->BindAction(ToggleWalkSpeedAction, ETriggerEvent::Started, this, &ADdBaseCharacter::ToggleWalkSpeed);
-		}
-	}
 }
 
 void ADdPlayerCharacter::Tick(float DeltaSeconds)
@@ -138,7 +66,7 @@ void ADdPlayerCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
+void ADdPlayerCharacter::ApplyCameraZoomInput(const FInputActionValue& Value)
 {
 	if (PlayerCameraComp != nullptr)
 	{
@@ -146,17 +74,14 @@ void ADdPlayerCharacter::CameraZoom(const FInputActionValue& Value)
 	}
 }
 
-void ADdPlayerCharacter::Move(const FInputActionValue& Value)
+void ADdPlayerCharacter::ApplyMoveInput(const FInputActionValue& Value)
 {
-	const FVector2D MovementVector = Value.Get<FVector2D>();
-
-	/*if (Controller == nullptr || !CanProcessMovementInput())
+	if (Controller == nullptr)
 	{
 		return;
 	}
 
-	TryBlendToMovementAnimation();*/
-
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 	const FRotator ControlRotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0.0f, ControlRotation.Yaw, 0.0f);
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -166,7 +91,7 @@ void ADdPlayerCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(RightDirection, MovementVector.X);
 }
 
-void ADdPlayerCharacter::Look(const FInputActionValue& Value)
+void ADdPlayerCharacter::ApplyLookInput(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	if (!FMath::IsNearlyZero(LookAxisVector.X))
@@ -181,7 +106,7 @@ void ADdPlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ADdPlayerCharacter::Attack()
+void ADdPlayerCharacter::TryAttack()
 {
 	if (!CanProcessAttackInput() || bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
 	{
@@ -196,7 +121,6 @@ void ADdPlayerCharacter::Attack()
 
 	bAttackAnimationPlaying = true;
 	bAttackMovementInputBlocked = true;
-	bCanTransitionFromAttackToMovement = false;
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
 	GetMesh()->PlayAnimation(AttackAnimation, false);
 	GetWorldTimerManager().SetTimer(
@@ -207,27 +131,9 @@ void ADdPlayerCharacter::Attack()
 		false);
 }
 
-void ADdPlayerCharacter::TryBlendToMovementAnimation()
-{
-	if (!bAttackAnimationPlaying || bAttackMovementInputBlocked || !bCanTransitionFromAttackToMovement)
-	{
-		return;
-	}
-
-	bAttackAnimationPlaying = false;
-	bCanTransitionFromAttackToMovement = false;
-	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
-}
-
 void ADdPlayerCharacter::FinishAttackAnimation()
 {
 	bAttackAnimationPlaying = false;
-	bCanTransitionFromAttackToMovement = false;
-}
-
-bool ADdPlayerCharacter::CanProcessMovementInput() const
-{
-	return !bAttackMovementInputBlocked;
 }
 
 bool ADdPlayerCharacter::CanProcessAttackInput() const
