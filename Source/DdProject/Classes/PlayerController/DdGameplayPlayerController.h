@@ -31,6 +31,7 @@ private:
 	void HandleCameraZoomTriggered(const FInputActionValue& Value);
 	void HandleToggleRotationModeStarted();
 	void HandleToggleWalkSpeedStarted();
+	void ToggleLocalGridDisplay();
 	void ToggleResultPopup();
 	void CloseResultPopup();
 	void HandleResultPopupClosed();
@@ -78,6 +79,12 @@ private:
 
 	UPROPERTY()
 	class UInputAction* GameplayFreeCursorAction;
+
+	UPROPERTY()
+	class UInputAction* GameplayLocalGridAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Debug")
+	class UDdLocalPlayerGridComponent* LocalPlayerGridComponent;
 
 	UPROPERTY()
 	bool bFreeCursorModeActive = false;

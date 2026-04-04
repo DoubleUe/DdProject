@@ -31,14 +31,12 @@ void UDdPlayerCameraComponent::CreateCameraComponents()
 		return;
 	}
 
-	// 카메라 붐 생성
 	CameraBoom = NewObject<USpringArmComponent>(Owner, TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComp);
 	CameraBoom->TargetArmLength = 400.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->RegisterComponent();
 
-	// 줌 범위 초기화
 	ACharacter* OwnerCharacter = Cast<ACharacter>(Owner);
 	if (OwnerCharacter != nullptr && OwnerCharacter->GetCapsuleComponent() != nullptr)
 	{
@@ -48,7 +46,6 @@ void UDdPlayerCameraComponent::CreateCameraComponents()
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength, MinCameraBoomLength, MaxCameraBoomLength);
 	DesiredCameraBoomLength = CameraBoom->TargetArmLength;
 
-	// 카메라 생성
 	FollowCamera = NewObject<UCameraComponent>(Owner, TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
@@ -73,7 +70,6 @@ void UDdPlayerCameraComponent::UpdateCameraZoom(float DeltaSeconds)
 		return;
 	}
 
-	// 캡슐 크기 변경 감지
 	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
 	if (OwnerCharacter != nullptr && OwnerCharacter->GetCapsuleComponent() != nullptr)
 	{

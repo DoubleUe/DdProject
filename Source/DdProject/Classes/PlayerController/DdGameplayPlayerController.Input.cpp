@@ -10,13 +10,16 @@
 #include "UObject/ConstructorHelpers.h"
 #include "../Character/DdBaseCharacter.h"
 #include "../Character/DdPlayerCharacter.h"
+#include "Components/DdLocalPlayerGridComponent.h"
 #include "../UI/Gameplay/DdResultPopupWidget.h"
 
 ADdGameplayPlayerController::ADdGameplayPlayerController()
 {
+	LocalPlayerGridComponent = CreateDefaultSubobject<UDdLocalPlayerGridComponent>(TEXT("LocalPlayerGridComponent"));
 	GameplayUtilityMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("GameplayUtilityMappingContext"));
 	GameplayToggleResultPopupAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleResultPopupAction"));
 	GameplayFreeCursorAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayFreeCursorAction"));
+	GameplayLocalGridAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayLocalGridAction"));
 	GameplayAttackAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayAttackAction"));
 	GameplayCameraZoomAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayCameraZoomAction"));
 	GameplayToggleRotationModeAction = CreateDefaultSubobject<UInputAction>(TEXT("GameplayToggleRotationModeAction"));
@@ -48,6 +51,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 	if (GameplayFreeCursorAction != nullptr)
 	{
 		GameplayFreeCursorAction->ValueType = EInputActionValueType::Boolean;
+	}
+
+	if (GameplayLocalGridAction != nullptr)
+	{
+		GameplayLocalGridAction->ValueType = EInputActionValueType::Boolean;
 	}
 
 	if (GameplayAttackAction != nullptr)
@@ -102,6 +110,11 @@ ADdGameplayPlayerController::ADdGameplayPlayerController()
 			GameplayUtilityMappingContext->MapKey(GameplayFreeCursorAction, EKeys::LeftAlt);
 			GameplayUtilityMappingContext->MapKey(GameplayFreeCursorAction, EKeys::RightAlt);
 		}
+
+		if (GameplayLocalGridAction != nullptr)
+		{
+			GameplayUtilityMappingContext->MapKey(GameplayLocalGridAction, EKeys::V);
+		}
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingContextAsset(TEXT("/Game/Design/Input/IMC_Default.IMC_Default"));
@@ -138,6 +151,10 @@ void ADdGameplayPlayerController::SetupInputComponent()
 void ADdGameplayPlayerController::ConfigureGameplayInput()
 {
 	bFreeCursorModeActive = false;
+	if (LocalPlayerGridComponent != nullptr)
+	{
+		LocalPlayerGridComponent->SetGridVisible(false);
+	}
 	RefreshInputMode();
 	RegisterGameplayMappingContexts();
 }
@@ -194,6 +211,11 @@ void ADdGameplayPlayerController::BindGameplayInputActions(UEnhancedInputCompone
 	{
 		EnhancedInputComponent->BindAction(GameplayFreeCursorAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::BeginFreeCursorMode);
 		EnhancedInputComponent->BindAction(GameplayFreeCursorAction, ETriggerEvent::Completed, this, &ADdGameplayPlayerController::EndFreeCursorMode);
+	}
+
+	if (GameplayLocalGridAction != nullptr)
+	{
+		EnhancedInputComponent->BindAction(GameplayLocalGridAction, ETriggerEvent::Started, this, &ADdGameplayPlayerController::ToggleLocalGridDisplay);
 	}
 }
 
@@ -259,6 +281,16 @@ void ADdGameplayPlayerController::HandleToggleWalkSpeedStarted()
 	{
 		BaseCharacter->ToggleWalkSpeed();
 	}
+}
+
+void ADdGameplayPlayerController::ToggleLocalGridDisplay()
+{
+	if (!IsLocalController() || LocalPlayerGridComponent == nullptr)
+	{
+		return;
+	}
+
+	LocalPlayerGridComponent->SetGridVisible(!LocalPlayerGridComponent->IsGridVisible());
 }
 
 void ADdGameplayPlayerController::RefreshInputMode()

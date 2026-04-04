@@ -1,7 +1,7 @@
 #include "DdPlayerCharacter.h"
 
 #include "Animation/AnimSequenceBase.h"
-#include "Component/DdPlayerCameraComponent.h"
+#include "Components/DdPlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"

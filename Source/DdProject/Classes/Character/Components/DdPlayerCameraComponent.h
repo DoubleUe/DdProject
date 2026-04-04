@@ -7,7 +7,6 @@
 class UCameraComponent;
 class USpringArmComponent;
 
-// 플레이어 캐릭터의 카메라 붐 및 카메라를 관리하는 컴포넌트
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DDPROJECT_API UDdPlayerCameraComponent : public UActorComponent
 {
@@ -16,10 +15,7 @@ class DDPROJECT_API UDdPlayerCameraComponent : public UActorComponent
 public:
 	UDdPlayerCameraComponent();
 
-	// 줌 입력 처리
 	void ZoomCamera(float Value);
-
-	// 매 프레임 줌 보간 업데이트
 	void UpdateCameraZoom(float DeltaSeconds);
 
 protected:
