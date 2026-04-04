@@ -4,6 +4,8 @@
 #include "Components/ActorComponent.h"
 #include "DdLocalPlayerGridComponent.generated.h"
 
+class UCanvas;
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DDPROJECT_API UDdLocalPlayerGridComponent : public UActorComponent
 {
@@ -14,12 +16,11 @@ public:
 
 	void SetGridVisible(bool bVisible);
 	bool IsGridVisible() const { return bGridVisible; }
-
-protected:
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void DrawGrid(UCanvas* Canvas) const;
 
 private:
-	void DrawLocalGrid(const FVector& Center) const;
+	bool SampleGroundPoint(const FVector2D& GridLocation, float ReferenceZ, const struct FCollisionQueryParams& QueryParams, FVector& OutGroundPoint) const;
+	void DrawSampledLine(UCanvas* Canvas, const class APlayerController& PlayerController, const struct FCollisionQueryParams& QueryParams, const FVector& Start, const FVector& End, float ReferenceZ) const;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid", meta = (ClampMin = "50.0"))
 	float GridSize = 1000.0f;
@@ -32,6 +33,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid", meta = (ClampMin = "0.1"))
 	float LineThickness = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid", meta = (ClampMin = "10.0"))
+	float HeightSampleStep = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid", meta = (ClampMin = "100.0"))
+	float GroundTraceHalfHeight = 5000.0f;
 
 	UPROPERTY()
 	bool bGridVisible = false;

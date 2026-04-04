@@ -83,7 +83,7 @@ private:
 	UPROPERTY()
 	class UInputAction* GameplayLocalGridAction;
 
-	UPROPERTY(VisibleAnywhere, Category = "Debug")
+	UPROPERTY(VisibleAnywhere, Category = "Grid")
 	class UDdLocalPlayerGridComponent* LocalPlayerGridComponent;
 
 	UPROPERTY()

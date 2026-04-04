@@ -3,6 +3,7 @@
 #include "../GameState/DdGameLevelGameState.h"
 #include "../PlayerController/DdGameplayPlayerController.h"
 #include "../PlayerState/DdGameplayPlayerState.h"
+#include "../UI/Gameplay/DdGameplayHud.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
@@ -17,6 +18,7 @@ ADdGameLevelGameMode::ADdGameLevelGameMode()
 	GameStateClass = ADdGameLevelGameState::StaticClass();
 	PlayerStateClass = ADdGameplayPlayerState::StaticClass();
 	PlayerControllerClass = ADdGameplayPlayerController::StaticClass();
+	HUDClass = ADdGameplayHud::StaticClass();
 
 	static ConstructorHelpers::FClassFinder<APawn> PlayerBPClass(TEXT("/Game/Characters/Player/BP_PlayerCharacter"));
 	if (PlayerBPClass.Succeeded())
