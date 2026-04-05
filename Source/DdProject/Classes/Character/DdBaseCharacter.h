@@ -43,9 +43,11 @@ public:
 	bool IsMovementInputBlocked() const { return bMovementInputBlocked; }
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void InitializeEquippedStaticMeshAttachment();
+	void ApplyCameraCollisionIgnores();
 	void SetAttacking(bool bInIsAttacking) { bIsAttacking = bInIsAttacking; }
 	void ApplyRotationModeFromState();
 	void SetUseControllerDesiredRotationMode(bool bInUseControllerDesiredRotationMode);

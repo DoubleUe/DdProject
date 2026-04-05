@@ -1,6 +1,7 @@
 #include "DdBaseCharacter.h"
 
 #include "CharacterTrajectoryComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -21,14 +22,23 @@ ADdBaseCharacter::ADdBaseCharacter()
 		EquippedStaticMeshComponent->SetCanEverAffectNavigation(false);
 	}
 
+	ApplyCameraCollisionIgnores();
 	ApplyRotationModeFromState();
 	ApplyWalkSpeedFromState();
+}
+
+void ADdBaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ApplyCameraCollisionIgnores();
 }
 
 void ADdBaseCharacter::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
+	ApplyCameraCollisionIgnores();
 	InitializeEquippedStaticMeshAttachment();
 }
 
@@ -74,6 +84,22 @@ void ADdBaseCharacter::ToggleWalkSpeed()
 	if (!HasAuthority())
 	{
 		ServerSetUseSlowWalkSpeed(bNextUseSlowWalkSpeed);
+	}
+}
+
+void ADdBaseCharacter::ApplyCameraCollisionIgnores()
+{
+	TArray<UPrimitiveComponent*> PrimitiveComponents;
+	GetComponents(PrimitiveComponents);
+
+	for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
+	{
+		if (PrimitiveComponent == nullptr || PrimitiveComponent->GetCollisionEnabled() == ECollisionEnabled::NoCollision)
+		{
+			continue;
+		}
+
+		PrimitiveComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	}
 }
 
