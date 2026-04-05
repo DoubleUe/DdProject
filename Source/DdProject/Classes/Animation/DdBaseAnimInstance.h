@@ -24,7 +24,7 @@ protected:
 	TObjectPtr<UCharacterMovementComponent> CharacterMovementComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "Character|Movement")
-	float Speed = 0.0f;
+	float CurrentSpeed = 0.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "Character|Movement")
 	bool bIsFalling = false;

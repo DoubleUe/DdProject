@@ -46,11 +46,11 @@ void UDdBaseAnimInstance::UpdateMovementState()
 {
 	if (!IsValid(CharacterMovementComponent))
 	{
-		Speed = 0.0f;
+		CurrentSpeed = 0.0f;
 		bIsFalling = false;
 		return;
 	}
 
-	Speed = CharacterMovementComponent->Velocity.Size();
+	CurrentSpeed = CharacterMovementComponent->Velocity.Size();
 	bIsFalling = CharacterMovementComponent->IsFalling();
 }
