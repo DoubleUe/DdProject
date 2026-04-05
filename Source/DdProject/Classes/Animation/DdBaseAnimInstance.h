@@ -23,10 +23,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "Character|Components")
 	TObjectPtr<UCharacterMovementComponent> CharacterMovementComponent = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "Character|Movement")
+	UPROPERTY(BlueprintReadOnly, Category = "Character|Movement", meta = (AllowPrivateAccess = "true"))
 	float CurrentSpeed = 0.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "Character|Movement")
+	UPROPERTY(BlueprintReadOnly, Category = "Character|Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsFalling = false;
 
 private:
