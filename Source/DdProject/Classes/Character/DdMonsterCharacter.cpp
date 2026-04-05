@@ -55,7 +55,6 @@ ADdMonsterCharacter::ADdMonsterCharacter()
 	IdleRunBlendSpace = nullptr;
 	PreviousAnimationLocation = FVector::ZeroVector;
 	bHasPreviousAnimationLocation = false;
-	bIsAttacking = false;
 	bIsPlayingBlendSpace = false;
 }
 
@@ -86,13 +85,12 @@ void ADdMonsterCharacter::LoadAnimationAssets()
 	bIsPlayingBlendSpace = false;
 }
 
-void ADdMonsterCharacter::SetAttackMovementInputBlocked(bool bBlocked)
+void ADdMonsterCharacter::SetMovementInputBlocked(bool bBlocked)
 {
-	bAttackMovementBlocked = bBlocked;
+	Super::SetMovementInputBlocked(bBlocked);
 
 	if (bBlocked)
 	{
-		// AI 이동 즉시 정지
 		if (AAIController* AIC = Cast<AAIController>(GetController()))
 		{
 			AIC->StopMovement();
@@ -105,21 +103,9 @@ void ADdMonsterCharacter::SetAttackMovementInputBlocked(bool bBlocked)
 	}
 }
 
-void ADdMonsterCharacter::SetAttackInputBlocked(bool bBlocked)
-{
-	bAttackInputBlocked = bBlocked;
-
-	// 노티파이가 공격을 허용하면 공격 상태 해제
-	if (!bBlocked && bIsAttacking)
-	{
-		bIsAttacking = false;
-	}
-}
-
 bool ADdMonsterCharacter::PlayAttackAnimation()
 {
-	// 공격 입력이 차단된 상태이거나 이미 공격 중이면 실패
-	if (bAttackInputBlocked || bIsAttacking)
+	if (!CanAttack())
 	{
 		return false;
 	}
@@ -129,15 +115,13 @@ bool ADdMonsterCharacter::PlayAttackAnimation()
 		return false;
 	}
 
-	bIsAttacking = true;
-
-	// 공격 시작 시 기본적으로 이동 차단 (노티파이가 있으면 해당 구간에서 허용)
-	SetAttackMovementInputBlocked(true);
+	SetAttacking(true);
+	SetMovementInputBlocked(true);
 
 	USkeletalMeshComponent* MeshComponent = FindSkeletalMeshComponent();
 	if (MeshComponent == nullptr)
 	{
-		bIsAttacking = false;
+		SetAttacking(false);
 		return false;
 	}
 
@@ -155,7 +139,6 @@ bool ADdMonsterCharacter::PlayAttackAnimation()
 		SingleNodeInstance->SetRootMotionMode(ERootMotionMode::IgnoreRootMotion);
 	}
 
-	// 블렌드 스페이스 초기화 (공격 끝난 후 이동 애니메이션이 다시 설정되도록)
 	bIsPlayingBlendSpace = false;
 
 	return true;
@@ -163,13 +146,17 @@ bool ADdMonsterCharacter::PlayAttackAnimation()
 
 void ADdMonsterCharacter::OnAttackAnimationEnded()
 {
-	// bIsAttacking은 UDdAttackInputNotifyState 노티파이가 제어
+	SetAttacking(false);
 	bIsPlayingBlendSpace = false;
 
-	// 노티파이가 정상적으로 종료되지 않은 경우 대비 안전장치
-	if (bAttackMovementBlocked)
+	if (IsAttackInputBlocked())
 	{
-		SetAttackMovementInputBlocked(false);
+		SetAttackInputBlocked(false);
+	}
+
+	if (IsMovementInputBlocked())
+	{
+		SetMovementInputBlocked(false);
 	}
 }
 
@@ -181,16 +168,12 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 		return;
 	}
 
-	// 공격 애니메이션 재생 중에는 이동 애니메이션을 덮어쓰지 않음
-	// 블렌드 스페이스가 이미 재생 중이면 노티파이 실행을 위해 계속 진행
-	if (bIsAttacking && !bIsPlayingBlendSpace)
+	if (IsAttacking() && !bIsPlayingBlendSpace)
 	{
-		// 공격 애니메이션이 끝났는지 확인
 		if (UAnimSingleNodeInstance* SingleNodeInstance = MeshComponent->GetSingleNodeInstance())
 		{
 			if (!SingleNodeInstance->IsPlaying())
 			{
-				// 애니메이션 종료 처리 후 블렌드 스페이스로 전환하여 노티파이 실행
 				OnAttackAnimationEnded();
 			}
 			else
@@ -221,7 +204,6 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 		return MeshComponent->GetSingleNodeInstance();
 	};
 
-	// 속도 계산
 	const FVector CurrentActorLocation = GetActorLocation();
 	float LocationSpeed2D = 0.0f;
 	if (bHasPreviousAnimationLocation && DeltaSeconds > UE_KINDA_SMALL_NUMBER)
@@ -237,7 +219,6 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 	const float MovementComponentSpeed2D = CharacterMovementComponent != nullptr ? CharacterMovementComponent->Velocity.Size2D() : 0.0f;
 	const float Speed2D = FMath::Max(ActorVelocitySpeed2D, FMath::Max(MovementComponentSpeed2D, LocationSpeed2D));
 
-	// 블렌드 스페이스로 아이들/런 모두 처리 (speed=0이면 아이들, speed>0이면 런)
 	if (UAnimSingleNodeInstance* SingleNodeInstance = EnsureSingleNodeInstance())
 	{
 		if (!bIsPlayingBlendSpace)
@@ -257,14 +238,12 @@ void ADdMonsterCharacter::UpdateMovementAnimation(float DeltaSeconds)
 
 USkeletalMeshComponent* ADdMonsterCharacter::FindSkeletalMeshComponent() const
 {
-	// 기본 ACharacter 메시 우선 사용
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	if (MeshComp != nullptr && MeshComp->GetSkeletalMeshAsset() != nullptr)
 	{
 		return MeshComp;
 	}
 
-	// BP에서 별도 추가된 SkeletalMeshComponent 검색
 	TArray<USkeletalMeshComponent*> SkeletalMeshComponents;
 	GetComponents<USkeletalMeshComponent>(SkeletalMeshComponents);
 	for (USkeletalMeshComponent* Comp : SkeletalMeshComponents)
@@ -275,6 +254,5 @@ USkeletalMeshComponent* ADdMonsterCharacter::FindSkeletalMeshComponent() const
 		}
 	}
 
-	// 메시 에셋이 없더라도 기본 컴포넌트 반환
 	return MeshComp;
 }

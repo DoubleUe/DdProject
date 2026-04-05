@@ -16,8 +16,6 @@ class DDPROJECT_API ADdPlayerCharacter : public ADdBaseCharacter
 
 public:
 	ADdPlayerCharacter();
-	virtual void SetAttackMovementInputBlocked(bool bBlocked) override;
-	virtual void SetAttackInputBlocked(bool bBlocked) override;
 	void ApplyCameraZoomInput(const FInputActionValue& Value);
 	void ApplyMoveInput(const FInputActionValue& Value);
 	void ApplyLookInput(const FInputActionValue& Value);
@@ -28,23 +26,12 @@ protected:
 
 private:
 	void FinishAttackAnimation();
-	bool CanProcessAttackInput() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDdPlayerCameraComponent> PlayerCameraComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAnimSequenceBase> AttackAnimation;
-
-	UPROPERTY()
-	bool bAttackAnimationPlaying = false;
-
-	UPROPERTY()
-	bool bAttackMovementInputBlocked = true;
-
-	// Controlled by animation notify states to gate attack input windows.
-	UPROPERTY()
-	bool bAttackInputBlocked = true;
 
 	FTimerHandle AttackAnimationTimerHandle;
 };

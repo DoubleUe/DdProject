@@ -45,6 +45,16 @@ void ADdBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ADdBaseCharacter, bUseSlowWalkSpeed);
 }
 
+void ADdBaseCharacter::SetMovementInputBlocked(bool bBlocked)
+{
+	bMovementInputBlocked = bBlocked;
+}
+
+void ADdBaseCharacter::SetAttackInputBlocked(bool bBlocked)
+{
+	bAttackInputBlocked = bBlocked;
+}
+
 void ADdBaseCharacter::ToggleRotationMode()
 {
 	const bool bNextUseControllerDesiredRotationMode = !bUseControllerDesiredRotationMode;

@@ -46,16 +46,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 	}
 }
 
-void ADdPlayerCharacter::SetAttackMovementInputBlocked(bool bBlocked)
-{
-	bAttackMovementInputBlocked = bBlocked;
-}
-
-void ADdPlayerCharacter::SetAttackInputBlocked(bool bBlocked)
-{
-	bAttackInputBlocked = bBlocked;
-}
-
 void ADdPlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -76,7 +66,7 @@ void ADdPlayerCharacter::ApplyCameraZoomInput(const FInputActionValue& Value)
 
 void ADdPlayerCharacter::ApplyMoveInput(const FInputActionValue& Value)
 {
-	if (Controller == nullptr)
+	if (Controller == nullptr || IsMovementInputBlocked())
 	{
 		return;
 	}
@@ -108,7 +98,7 @@ void ADdPlayerCharacter::ApplyLookInput(const FInputActionValue& Value)
 
 void ADdPlayerCharacter::TryAttack()
 {
-	if (!CanProcessAttackInput() || bAttackAnimationPlaying || AttackAnimation == nullptr || GetMesh() == nullptr)
+	if (!CanAttack() || AttackAnimation == nullptr || GetMesh() == nullptr)
 	{
 		return;
 	}
@@ -119,8 +109,8 @@ void ADdPlayerCharacter::TryAttack()
 		return;
 	}
 
-	bAttackAnimationPlaying = true;
-	bAttackMovementInputBlocked = true;
+	SetAttacking(true);
+	SetMovementInputBlocked(true);
 	GetWorldTimerManager().ClearTimer(AttackAnimationTimerHandle);
 	GetMesh()->PlayAnimation(AttackAnimation, false);
 	GetWorldTimerManager().SetTimer(
@@ -133,10 +123,10 @@ void ADdPlayerCharacter::TryAttack()
 
 void ADdPlayerCharacter::FinishAttackAnimation()
 {
-	bAttackAnimationPlaying = false;
-}
+	SetAttacking(false);
 
-bool ADdPlayerCharacter::CanProcessAttackInput() const
-{
-	return !bAttackInputBlocked;
+	if (IsMovementInputBlocked())
+	{
+		SetMovementInputBlocked(false);
+	}
 }

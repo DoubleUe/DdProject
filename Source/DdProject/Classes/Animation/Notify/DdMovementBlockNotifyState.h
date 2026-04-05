@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "DdMovementInputNotifyState.generated.h"
+#include "DdMovementBlockNotifyState.generated.h"
 
-UCLASS(DisplayName="Movement Input State")
-class DDPROJECT_API UDdMovementInputNotifyState : public UAnimNotifyState
+UCLASS(DisplayName="Movement Block State")
+class DDPROJECT_API UDdMovementBlockNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 

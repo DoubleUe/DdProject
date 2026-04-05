@@ -27,13 +27,26 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void SetAttackMovementInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackMovementInputBlocked, );
-	virtual void SetAttackInputBlocked(bool bBlocked) PURE_VIRTUAL(ADdBaseCharacter::SetAttackInputBlocked, );
+	virtual void SetMovementInputBlocked(bool bBlocked);
+	virtual void SetAttackInputBlocked(bool bBlocked);
+
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsAttackInputBlocked() const { return bAttackInputBlocked; }
+
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsAttacking() const { return bIsAttacking; }
+
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool CanAttack() const { return !bAttackInputBlocked && !bIsAttacking; }
+
+	UFUNCTION(BlueprintPure, Category = "Movement")
+	bool IsMovementInputBlocked() const { return bMovementInputBlocked; }
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	void InitializeEquippedStaticMeshAttachment();
+	void SetAttacking(bool bInIsAttacking) { bIsAttacking = bInIsAttacking; }
 	void ApplyRotationModeFromState();
 	void SetUseControllerDesiredRotationMode(bool bInUseControllerDesiredRotationMode);
 	void ApplyWalkSpeedFromState();
@@ -74,4 +87,13 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_UseSlowWalkSpeed, Transient)
 	bool bUseSlowWalkSpeed = false;
+
+	UPROPERTY(Transient)
+	bool bAttackInputBlocked = false;
+
+	UPROPERTY(Transient)
+	bool bIsAttacking = false;
+
+	UPROPERTY(Transient)
+	bool bMovementInputBlocked = false;
 };

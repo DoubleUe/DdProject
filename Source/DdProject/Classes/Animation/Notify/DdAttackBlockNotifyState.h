@@ -2,11 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "DdAttackInputNotifyState.generated.h"
+#include "DdAttackBlockNotifyState.generated.h"
 
-// 이 노티파이가 활성화된 구간에서만 공격 입력이 가능
-UCLASS(DisplayName="Attack Input State")
-class DDPROJECT_API UDdAttackInputNotifyState : public UAnimNotifyState
+UCLASS(DisplayName="Attack Block State")
+class DDPROJECT_API UDdAttackBlockNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 
@@ -16,6 +15,6 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 #if WITH_EDITORONLY_DATA
-	virtual FLinearColor GetEditorColor() override { return FLinearColor(0.9f, 0.3f, 0.2f, 1.0f); }
+	virtual FLinearColor GetEditorColor() override { return FLinearColor(0.85f, 0.2f, 0.2f, 1.0f); }
 #endif
 };
