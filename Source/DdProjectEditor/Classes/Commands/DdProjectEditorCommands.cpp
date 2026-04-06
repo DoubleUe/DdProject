@@ -9,7 +9,7 @@
 FDdProjectEditorCommands::FDdProjectEditorCommands()
 	: TCommands<FDdProjectEditorCommands>(
 		TEXT("DdProjectEditor"),
-		LOCTEXT("ContextDescription", "DdProject Zombie Spawn Tools"),
+		LOCTEXT("ContextDescription", "DdProject Editor Windows"),
 		NAME_None,
 		FAppStyle::GetAppStyleSetName())
 {
@@ -18,11 +18,18 @@ FDdProjectEditorCommands::FDdProjectEditorCommands()
 void FDdProjectEditorCommands::RegisterCommands()
 {
 	UI_COMMAND(
-		OpenTestToolsWindow,
-		"Open Zombie Spawn Tools",
-		"Open the zombie spawn tools window.",
+		OpenZombieSpawnWindow,
+		"Open Zombie Spawn",
+		"Open the zombie spawn window.",
 		EUserInterfaceActionType::Button,
-		FInputChord(EKeys::RightBracket));
+		FInputChord());
+
+	UI_COMMAND(
+		OpenTableEditorWindow,
+		"Open Table Editor",
+		"Open the table editor window.",
+		EUserInterfaceActionType::Button,
+		FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

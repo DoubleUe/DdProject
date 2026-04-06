@@ -10,5 +10,6 @@ public:
 
 	virtual void RegisterCommands() override;
 
-	TSharedPtr<FUICommandInfo> OpenTestToolsWindow;
+	TSharedPtr<FUICommandInfo> OpenZombieSpawnWindow;
+	TSharedPtr<FUICommandInfo> OpenTableEditorWindow;
 };

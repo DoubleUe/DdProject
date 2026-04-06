@@ -5,7 +5,6 @@
 #include "Modules/ModuleInterface.h"
 
 class FSpawnTabArgs;
-class IInputProcessor;
 class FUICommandList;
 class SDockTab;
 class UWorld;
@@ -17,14 +16,16 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
-	void OpenTestToolsWindow();
-	void SpawnZombieFromTools();
-	TSharedRef<SDockTab> SpawnTestToolsTab(const FSpawnTabArgs& SpawnTabArgs);
+	void OpenZombieSpawnWindow();
+	void OpenTableEditorWindow();
+	void SpawnZombieFromZombieSpawnPanel();
+	TSharedRef<SDockTab> SpawnZombieSpawnTab(const FSpawnTabArgs& SpawnTabArgs);
+	TSharedRef<SDockTab> SpawnTableEditorTab(const FSpawnTabArgs& SpawnTabArgs);
 	UWorld* GetTargetWorld() const;
 	void ShowNotification(const FText& Message) const;
 
-	static const FName TestToolsTabName;
+	static const FName ZombieSpawnTabName;
+	static const FName TableEditorTabName;
 
 	TSharedPtr<FUICommandList> EditorCommands;
-	TSharedPtr<IInputProcessor> ShortcutInputProcessor;
 };
