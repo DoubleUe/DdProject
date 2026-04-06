@@ -19,6 +19,7 @@ public class DdProjectEditor : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
+			"Json",
 			"LevelEditor",
 			"Slate",
 			"SlateCore",

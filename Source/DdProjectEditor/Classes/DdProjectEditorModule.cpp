@@ -1,88 +1,24 @@
 #include "DdProjectEditorModule.h"
 
 #include "Editor.h"
-#include "Framework/Application/IInputProcessor.h"
-#include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/UICommandList.h"
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Notifications/NotificationManager.h"
-#include "InputCoreTypes.h"
 #include "LevelEditor.h"
-#include "Modules/ModuleManager.h"
-#include "Test/DdTestManager.h"
 #include "Commands/DdProjectEditorCommands.h"
+#include "Modules/ModuleManager.h"
+#include "Panels/TableEditor/SDdTableEditorPanel.h"
+#include "Panels/ZombieSpawn/SDdZombieSpawnPanel.h"
+#include "Test/DdTestManager.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "Widgets/SDdTestToolsPanel.h"
 #include "WorkspaceMenuStructure.h"
 #include "WorkspaceMenuStructureModule.h"
 
 #define LOCTEXT_NAMESPACE "FDdProjectEditorModule"
 
-const FName FDdProjectEditorModule::TestToolsTabName(TEXT("DdProjectEditor_TestTools"));
-
-namespace
-{
-	class FTestToolsShortcutInputProcessor final : public IInputProcessor
-	{
-	public:
-		explicit FTestToolsShortcutInputProcessor(TFunction<void()> InOnShortcutPressed)
-			: OnShortcutPressed(MoveTemp(InOnShortcutPressed))
-		{
-		}
-
-		virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor) override
-		{
-		}
-
-		virtual bool HandleKeyDownEvent(FSlateApplication& SlateApp, const FKeyEvent& InKeyEvent) override
-		{
-			if (InKeyEvent.IsRepeat())
-			{
-				return false;
-			}
-
-			if (InKeyEvent.GetKey() != EKeys::RightBracket)
-			{
-				return false;
-			}
-
-			if (InKeyEvent.IsAltDown() || InKeyEvent.IsControlDown() || InKeyEvent.IsCommandDown())
-			{
-				return false;
-			}
-
-			const TSharedPtr<SWidget> FocusedWidget = SlateApp.GetKeyboardFocusedWidget();
-			if (FocusedWidget.IsValid())
-			{
-				const FName FocusedWidgetType = FocusedWidget->GetType();
-				if (FocusedWidgetType == TEXT("SEditableText")
-					|| FocusedWidgetType == TEXT("SEditableTextBox")
-					|| FocusedWidgetType == TEXT("SMultiLineEditableText")
-					|| FocusedWidgetType == TEXT("SMultiLineEditableTextBox"))
-				{
-					return false;
-				}
-			}
-
-			if (OnShortcutPressed)
-			{
-				OnShortcutPressed();
-				return true;
-			}
-
-			return false;
-		}
-
-		virtual const TCHAR* GetDebugName() const override
-		{
-			return TEXT("FTestToolsShortcutInputProcessor");
-		}
-
-	private:
-		TFunction<void()> OnShortcutPressed;
-	};
-}
+const FName FDdProjectEditorModule::ZombieSpawnTabName(TEXT("DdProjectEditor_ZombieSpawn"));
+const FName FDdProjectEditorModule::TableEditorTabName(TEXT("DdProjectEditor_TableEditor"));
 
 IMPLEMENT_MODULE(FDdProjectEditorModule, DdProjectEditor)
 
@@ -97,24 +33,27 @@ void FDdProjectEditorModule::StartupModule()
 
 	EditorCommands = MakeShared<FUICommandList>();
 	EditorCommands->MapAction(
-		FDdProjectEditorCommands::Get().OpenTestToolsWindow,
-		FExecuteAction::CreateRaw(this, &FDdProjectEditorModule::OpenTestToolsWindow));
+		FDdProjectEditorCommands::Get().OpenZombieSpawnWindow,
+		FExecuteAction::CreateRaw(this, &FDdProjectEditorModule::OpenZombieSpawnWindow));
+	EditorCommands->MapAction(
+		FDdProjectEditorCommands::Get().OpenTableEditorWindow,
+		FExecuteAction::CreateRaw(this, &FDdProjectEditorModule::OpenTableEditorWindow));
 
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 	LevelEditorModule.GetGlobalLevelEditorActions()->Append(EditorCommands.ToSharedRef());
 
-	ShortcutInputProcessor = MakeShared<FTestToolsShortcutInputProcessor>([this]()
-	{
-		OpenTestToolsWindow();
-	});
-
-	FSlateApplication::Get().RegisterInputPreProcessor(ShortcutInputProcessor);
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+		ZombieSpawnTabName,
+		FOnSpawnTab::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieSpawnTab))
+		.SetDisplayName(LOCTEXT("ZombieSpawnTabTitle", "Zombie Spawn"))
+		.SetTooltipText(LOCTEXT("ZombieSpawnTabTooltip", "Open the zombie spawn window."))
+		.SetGroup(WorkspaceMenu::GetMenuStructure().GetDeveloperToolsMiscCategory());
 
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
-		TestToolsTabName,
-		FOnSpawnTab::CreateRaw(this, &FDdProjectEditorModule::SpawnTestToolsTab))
-		.SetDisplayName(LOCTEXT("TestToolsTabTitle", "Zombie Spawn Tools"))
-		.SetTooltipText(LOCTEXT("TestToolsTabTooltip", "Open the zombie spawn tools window."))
+		TableEditorTabName,
+		FOnSpawnTab::CreateRaw(this, &FDdProjectEditorModule::SpawnTableEditorTab))
+		.SetDisplayName(LOCTEXT("TableEditorTabTitle", "Table Editor"))
+		.SetTooltipText(LOCTEXT("TableEditorTabTooltip", "Open the table editor window."))
 		.SetGroup(WorkspaceMenu::GetMenuStructure().GetDeveloperToolsMiscCategory());
 }
 
@@ -128,30 +67,28 @@ void FDdProjectEditorModule::ShutdownModule()
 	if (FModuleManager::Get().IsModuleLoaded("LevelEditor"))
 	{
 		FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>("LevelEditor");
-		LevelEditorModule.GetGlobalLevelEditorActions()->UnmapAction(FDdProjectEditorCommands::Get().OpenTestToolsWindow);
+		LevelEditorModule.GetGlobalLevelEditorActions()->UnmapAction(FDdProjectEditorCommands::Get().OpenZombieSpawnWindow);
+		LevelEditorModule.GetGlobalLevelEditorActions()->UnmapAction(FDdProjectEditorCommands::Get().OpenTableEditorWindow);
 	}
 
-	if (FSlateApplication::IsInitialized())
-	{
-		if (ShortcutInputProcessor.IsValid())
-		{
-			FSlateApplication::Get().UnregisterInputPreProcessor(ShortcutInputProcessor);
-		}
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(ZombieSpawnTabName);
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(TableEditorTabName);
 
-		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(TestToolsTabName);
-	}
-
-	ShortcutInputProcessor.Reset();
 	EditorCommands.Reset();
 	FDdProjectEditorCommands::Unregister();
 }
 
-void FDdProjectEditorModule::OpenTestToolsWindow()
+void FDdProjectEditorModule::OpenZombieSpawnWindow()
 {
-	FGlobalTabmanager::Get()->TryInvokeTab(FTabId(TestToolsTabName));
+	FGlobalTabmanager::Get()->TryInvokeTab(FTabId(ZombieSpawnTabName));
 }
 
-void FDdProjectEditorModule::SpawnZombieFromTools()
+void FDdProjectEditorModule::OpenTableEditorWindow()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(FTabId(TableEditorTabName));
+}
+
+void FDdProjectEditorModule::SpawnZombieFromZombieSpawnPanel()
 {
 	UWorld* World = GetTargetWorld();
 	if (World == nullptr)
@@ -183,14 +120,24 @@ void FDdProjectEditorModule::SpawnZombieFromTools()
 	ShowNotification(LOCTEXT("ZombieSpawnedInEditor", "Zombie spawned in the editor world."));
 }
 
-TSharedRef<SDockTab> FDdProjectEditorModule::SpawnTestToolsTab(const FSpawnTabArgs& SpawnTabArgs)
+TSharedRef<SDockTab> FDdProjectEditorModule::SpawnZombieSpawnTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
-		.Label(LOCTEXT("TestToolsTabLabel", "Zombie Spawn Tools"))
+		.Label(LOCTEXT("ZombieSpawnTabLabel", "Zombie Spawn"))
 		[
-			SNew(SDdTestToolsPanel)
-			.OnSpawnZombie(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieFromTools))
+			SNew(SDdZombieSpawnPanel)
+			.OnSpawnZombie(FSimpleDelegate::CreateRaw(this, &FDdProjectEditorModule::SpawnZombieFromZombieSpawnPanel))
+		];
+}
+
+TSharedRef<SDockTab> FDdProjectEditorModule::SpawnTableEditorTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return SNew(SDockTab)
+		.TabRole(ETabRole::NomadTab)
+		.Label(LOCTEXT("TableEditorTabLabel", "Table Editor"))
+		[
+			SNew(SDdTableEditorPanel)
 		];
 }
 
