@@ -2,6 +2,15 @@
 
 #include "Dom/JsonObject.h"
 
+namespace
+{
+	const TMap<FString, EDdWeaponType> WeaponTypeMap =
+	{
+		{ TEXT("Melee"), EDdWeaponType::Melee },
+		{ TEXT("Ranged"), EDdWeaponType::Ranged },
+	};
+}
+
 FDdWeaponTable::FDdWeaponTable()
 	: FDdJsonTableBase(TEXT("Weapon.json"))
 {
@@ -30,7 +39,7 @@ bool FDdWeaponTable::DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject)
 
 	FDdWeaponTableRow& Row = Rows.AddDefaulted_GetRef();
 	Row.Id = static_cast<int32>(IdValue);
-	Row.Type = GetOptionalStringField(JsonObject, TEXT("Type"));
+	Row.Type = ParseEnum(GetOptionalStringField(JsonObject, TEXT("eType")), WeaponTypeMap, EDdWeaponType::None);
 	Row.ResourceId = GetOptionalIntField(JsonObject, TEXT("ResourceID"));
 	Row.WeaponBoneName = GetOptionalStringField(JsonObject, TEXT("WeaponBoneName"));
 	Row.CharacterBoneName = GetOptionalStringField(JsonObject, TEXT("CharacterBoneName"));

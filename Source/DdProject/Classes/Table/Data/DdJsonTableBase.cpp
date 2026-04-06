@@ -23,6 +23,12 @@ int32 FDdJsonTableBase::GetOptionalIntField(const TSharedPtr<FJsonObject>& JsonO
 	return JsonObject.IsValid() && JsonObject->TryGetNumberField(FieldName, NumberValue) ? static_cast<int32>(NumberValue) : 0;
 }
 
+bool FDdJsonTableBase::GetOptionalBoolField(const TSharedPtr<FJsonObject>& JsonObject, const TCHAR* FieldName)
+{
+	const FString Value = GetOptionalStringField(JsonObject, FieldName);
+	return Value.Equals(TEXT("TRUE"), ESearchCase::IgnoreCase);
+}
+
 bool FDdJsonTableBase::Load()
 {
 	ResetRows();

@@ -9,11 +9,12 @@ void UDdTableSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		return;
 	}
 
+	const bool bActionLoaded = InitializeActionTable();
 	const bool bGameDataLoaded = InitializeGameDataTable();
 	const bool bResourceLoaded = InitializeResourceTable();
 	const bool bWeaponLoaded = InitializeWeaponTable();
 
-	bIsInitialized = bGameDataLoaded && bResourceLoaded && bWeaponLoaded;
+	bIsInitialized = bActionLoaded && bGameDataLoaded && bResourceLoaded && bWeaponLoaded;
 
 	if (bIsInitialized)
 	{
@@ -41,6 +42,19 @@ const FDdWeaponTable& UDdTableSubsystem::GetWeaponTable() const
 {
 	check(bIsInitialized);
 	return WeaponTable;
+}
+
+const FDdActionTable& UDdTableSubsystem::GetActionTable() const
+{
+	check(bIsInitialized);
+	return ActionTable;
+}
+
+bool UDdTableSubsystem::InitializeActionTable()
+{
+	const bool bLoaded = ActionTable.Load();
+	UE_LOG(LogTemp, Log, TEXT("Action table load result: %s"), bLoaded ? TEXT("Success") : TEXT("Failed"));
+	return bLoaded;
 }
 
 bool UDdTableSubsystem::InitializeGameDataTable()

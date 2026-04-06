@@ -1,7 +1,7 @@
 [
     {
         "id":  1,
-        "Type":  "Melee",
+        "eType":  "Melee",
         "ResourceID":  1,
         "WeaponBoneName":  "hand",
         "CharacterBoneName":  "hand_r_weapon",
@@ -10,7 +10,7 @@
     },
     {
         "id":  2,
-        "Type":  "Ranged",
+        "eType":  "Ranged",
         "ResourceID":  null,
         "WeaponBoneName":  null,
         "CharacterBoneName":  null,

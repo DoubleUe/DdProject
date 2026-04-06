@@ -1,0 +1,7 @@
+{
+    "id":  1,
+    "eType":  "NormalAttack",
+    "Combo_ResourceID_1":  2,
+    "bCombo_Blend_1":  "TRUE",
+    "Desc":  "플레이어 기본 평타"
+}

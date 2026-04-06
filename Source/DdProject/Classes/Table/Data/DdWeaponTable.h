@@ -3,10 +3,17 @@
 #include "CoreMinimal.h"
 #include "Table/Data/DdJsonTableBase.h"
 
+enum class EDdWeaponType : uint8
+{
+	None,
+	Melee,
+	Ranged,
+};
+
 struct FDdWeaponTableRow
 {
 	int32 Id = 0;
-	FString Type;
+	EDdWeaponType Type = EDdWeaponType::None;
 	int32 ResourceId = 0;
 	FString WeaponBoneName;
 	FString CharacterBoneName;

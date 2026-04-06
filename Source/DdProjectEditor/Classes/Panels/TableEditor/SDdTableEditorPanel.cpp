@@ -1,6 +1,7 @@
 #include "Panels/TableEditor/SDdTableEditorPanel.h"
 
 #include "Dom/JsonObject.h"
+#include "Dom/JsonValue.h"
 #include "HAL/FileManager.h"
 #include "Input/Reply.h"
 #include "Misc/FileHelper.h"
@@ -192,17 +193,27 @@ void SDdTableEditorPanel::ReloadSelectedTableRows()
 		{
 			TArray<TSharedPtr<FJsonValue>> JsonValues;
 			const TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonText);
+
+			// 배열 파싱 시도, 실패하면 단일 객체로 시도
 			if (!FJsonSerializer::Deserialize(JsonReader, JsonValues))
 			{
-				SetMessageRow(TEXT("Failed to parse JSON array."));
+				TSharedPtr<FJsonObject> SingleObject;
+				const TSharedRef<TJsonReader<>> RetryReader = TJsonReaderFactory<>::Create(JsonText);
+				if (FJsonSerializer::Deserialize(RetryReader, SingleObject) && SingleObject.IsValid())
+				{
+					JsonValues.Add(MakeShared<FJsonValueObject>(SingleObject));
+				}
 			}
-			else if (JsonValues.Num() == 0)
+
+			if (JsonValues.Num() == 0)
 			{
 				SetMessageRow(TEXT("The selected table has no rows."));
 			}
 			else
 			{
+				// JSON 키 순서를 유지하면서 컬럼 수집
 				TSet<FName> ColumnIdSet;
+				TArray<FName> OrderedColumnIds;
 				for (int32 Index = 0; Index < JsonValues.Num(); ++Index)
 				{
 					const TSharedPtr<FJsonObject> JsonObject = JsonValues[Index].IsValid() ? JsonValues[Index]->AsObject() : nullptr;
@@ -213,23 +224,17 @@ void SDdTableEditorPanel::ReloadSelectedTableRows()
 
 					for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : JsonObject->Values)
 					{
-						ColumnIdSet.Add(FName(*Pair.Key));
+						const FName ColumnId(*Pair.Key);
+						if (!ColumnIdSet.Contains(ColumnId))
+						{
+							ColumnIdSet.Add(ColumnId);
+							OrderedColumnIds.Add(ColumnId);
+						}
 					}
 				}
 
 				TableColumnIds.Add(RowNumberColumnId);
-				if (ColumnIdSet.Contains(FName(TEXT("id"))))
-				{
-					TableColumnIds.Add(FName(TEXT("id")));
-					ColumnIdSet.Remove(FName(TEXT("id")));
-				}
-
-				TArray<FName> SortedColumnIds = ColumnIdSet.Array();
-				SortedColumnIds.Sort([](const FName& Left, const FName& Right)
-				{
-					return Left.LexicalLess(Right);
-				});
-				TableColumnIds.Append(SortedColumnIds);
+				TableColumnIds.Append(OrderedColumnIds);
 
 				for (int32 Index = 0; Index < JsonValues.Num(); ++Index)
 				{
@@ -433,7 +438,22 @@ FText SDdTableEditorPanel::GetColumnDisplayText(const FName& ColumnId) const
 		return LOCTEXT("RowNumberColumn", "Row");
 	}
 
-	return FText::FromName(ColumnId);
+	FString ColumnName = ColumnId.ToString();
+
+	// e 접두사(enum), b 접두사(boolean) 제거하여 표시
+	if (ColumnName.Len() > 1 && FChar::IsUpper(ColumnName[1]))
+	{
+		if (ColumnName[0] == TEXT('e'))
+		{
+			ColumnName = ColumnName.Mid(1) + TEXT(" (enum)");
+		}
+		else if (ColumnName[0] == TEXT('b'))
+		{
+			ColumnName = ColumnName.Mid(1) + TEXT(" (bool)");
+		}
+	}
+
+	return FText::FromString(ColumnName);
 }
 
 #undef LOCTEXT_NAMESPACE
