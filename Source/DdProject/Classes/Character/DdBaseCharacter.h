@@ -5,7 +5,6 @@
 #include "DdBaseCharacter.generated.h"
 
 class UCharacterTrajectoryComponent;
-class UStaticMeshComponent;
 class FLifetimeProperty;
 
 UCLASS(Abstract)
@@ -46,7 +45,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	void InitializeEquippedStaticMeshAttachment();
 	void ApplyCameraCollisionIgnores();
 	void SetAttacking(bool bInIsAttacking) { bIsAttacking = bInIsAttacking; }
 	void ApplyRotationModeFromState();
@@ -69,20 +67,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Trajectory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCharacterTrajectoryComponent> TrajectoryComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> EquippedStaticMeshComponent;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float NormalWalkSpeed = 500.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float SlowWalkSpeed = 250.0f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
-	FName EquippedStaticMeshParentSocketName = TEXT("hand_r_weapon");
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
-	FName EquippedStaticMeshChildSocketName = TEXT("hand");
 
 	UPROPERTY(ReplicatedUsing = OnRep_UseControllerDesiredRotationMode, Transient)
 	bool bUseControllerDesiredRotationMode = false;
