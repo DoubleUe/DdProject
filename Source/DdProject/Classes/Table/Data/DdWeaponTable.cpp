@@ -24,7 +24,8 @@ bool FDdWeaponTable::DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject)
 	Row.Id = static_cast<int32>(IdValue);
 	Row.Type = GetOptionalStringField(JsonObject, TEXT("Type"));
 	Row.ResourceId = GetOptionalIntField(JsonObject, TEXT("ResourceID"));
-	Row.BoneName = GetOptionalStringField(JsonObject, TEXT("BoneName"));
+	Row.WeaponBoneName = GetOptionalStringField(JsonObject, TEXT("WeaponBoneName"));
+	Row.CharacterBoneName = GetOptionalStringField(JsonObject, TEXT("CharacterBoneName"));
 	Row.ComboIds = GetOptionalStringField(JsonObject, TEXT("ComboIDs"));
 	Row.Desc = GetOptionalStringField(JsonObject, TEXT("Desc"));
 	return true;

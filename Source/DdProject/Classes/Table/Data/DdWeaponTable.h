@@ -8,7 +8,8 @@ struct FDdWeaponTableRow
 	int32 Id = 0;
 	FString Type;
 	int32 ResourceId = 0;
-	FString BoneName;
+	FString WeaponBoneName;
+	FString CharacterBoneName;
 	FString ComboIds;
 	FString Desc;
 };
