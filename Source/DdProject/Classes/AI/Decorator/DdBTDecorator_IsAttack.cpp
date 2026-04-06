@@ -26,5 +26,5 @@ bool UDdBTDecorator_IsAttack::CalculateRawConditionValue(UBehaviorTreeComponent&
 	const float Distance = Monster->GetDistanceToTarget();
 	const bool bInRange = Distance > 0.0f && Distance <= AttackRange;
 
-	return bInRange && Monster->CanAttack();
+	return bInRange && !Monster->IsAttackBlocked();
 }

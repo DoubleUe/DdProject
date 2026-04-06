@@ -1,16 +1,11 @@
 #include "DdPlayerCharacter.h"
 
-#include "Components/SceneComponent.h"
+#include "Components/DdCombatComponent.h"
 #include "Components/DdPlayerCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "InputActionValue.h"
-#include "Table/Data/DdResourceTable.h"
-#include "Table/Data/DdWeaponTable.h"
-#include "Table/DdTableSubsystem.h"
-#include "Util/DdUtil.h"
-#include "Weapon/DdWeaponActor.h"
 
 ADdPlayerCharacter::ADdPlayerCharacter()
 {
@@ -40,11 +35,6 @@ ADdPlayerCharacter::ADdPlayerCharacter()
 void ADdPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (HasAuthority())
-	{
-		InitializeWeaponActor();
-	}
 }
 
 void ADdPlayerCharacter::Tick(float DeltaSeconds)
@@ -97,118 +87,30 @@ void ADdPlayerCharacter::ApplyLookInput(const FInputActionValue& Value)
 	}
 }
 
-void ADdPlayerCharacter::Destroyed()
-{
-	DestroyWeaponActor();
-	Super::Destroyed();
-}
-
 void ADdPlayerCharacter::TryAttack()
 {
-}
-
-void ADdPlayerCharacter::InitializeWeaponActor()
-{
-	DestroyWeaponActor();
-
-	if (WeaponId <= 0)
+	if (IsAttackBlocked() || CombatComponent == nullptr)
 	{
 		return;
 	}
 
-	UGameInstance* GameInstance = GetGameInstance();
-	if (GameInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to initialize weapon. GameInstance is null."));
-		return;
-	}
-
-	UDdTableSubsystem* TableSubsystem = GameInstance->GetSubsystem<UDdTableSubsystem>();
-	if (TableSubsystem == nullptr || !TableSubsystem->IsInitialized())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to initialize weapon. TableSubsystem is not ready."));
-		return;
-	}
-
-	const FDdWeaponTableRow* WeaponRow = TableSubsystem->GetWeaponTable().FindRowById(WeaponId);
-	if (WeaponRow == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to find weapon row for WeaponId %d."), WeaponId);
-		return;
-	}
-
-	const FDdResourceTableRow* ResourceRow = TableSubsystem->GetResourceTable().FindRowById(WeaponRow->ResourceId);
-	if (ResourceRow == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to find resource row for ResourceId %d."), WeaponRow->ResourceId);
-		return;
-	}
-
-	UClass* WeaponActorClass = FDdUtil::LoadClassFromPath(ResourceRow->Path, ADdWeaponActor::StaticClass());
-	if (WeaponActorClass == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to resolve weapon class from path: %s"), *ResourceRow->Path);
-		return;
-	}
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = this;
-	SpawnParameters.Instigator = this;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	EquippedWeaponActor = GetWorld()->SpawnActor<ADdWeaponActor>(WeaponActorClass, GetActorTransform(), SpawnParameters);
-	if (EquippedWeaponActor == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter failed to spawn weapon actor for WeaponId %d."), WeaponId);
-		return;
-	}
-
-	EquippedWeaponActor->PrepareForCharacterAttachment(this);
-	AttachWeaponActorToCharacter(*WeaponRow, EquippedWeaponActor);
-}
-
-void ADdPlayerCharacter::DestroyWeaponActor()
-{
-	if (EquippedWeaponActor == nullptr)
+	const TArray<FDdComboSet>& ComboSets = CombatComponent->GetComboSets();
+	if (ComboSets.Num() == 0 || ComboSets[0].Steps.Num() == 0)
 	{
 		return;
 	}
 
-	if (EquippedWeaponActor->IsValidLowLevel())
-	{
-		EquippedWeaponActor->Destroy();
-	}
-
-	EquippedWeaponActor = nullptr;
-}
-void ADdPlayerCharacter::AttachWeaponActorToCharacter(const FDdWeaponTableRow& WeaponRow, ADdWeaponActor* WeaponActor) const
-{
-	if (WeaponActor == nullptr || GetMesh() == nullptr || WeaponActor->GetRootComponent() == nullptr)
+	UAnimMontage* Montage = ComboSets[0].Steps[0].Montage;
+	if (Montage == nullptr)
 	{
 		return;
 	}
 
-	const FName CharacterBoneName = WeaponRow.CharacterBoneName.IsEmpty() ? NAME_None : FName(*WeaponRow.CharacterBoneName);
-	const FName WeaponBoneName = WeaponRow.WeaponBoneName.IsEmpty() ? NAME_None : FName(*WeaponRow.WeaponBoneName);
-	const bool bHasCharacterSocket = CharacterBoneName != NAME_None && GetMesh()->DoesSocketExist(CharacterBoneName);
-
-	const FTransform ParentAttachWorldTransform = bHasCharacterSocket
-		? GetMesh()->GetSocketTransform(CharacterBoneName, RTS_World)
-		: GetMesh()->GetComponentTransform();
-
-	const USceneComponent* WeaponAttachComponent = WeaponActor->GetWeaponAttachComponent();
-	FTransform WeaponAttachWorldTransform = WeaponActor->GetActorTransform();
-	if (WeaponAttachComponent != nullptr)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance == nullptr)
 	{
-		const bool bHasWeaponSocket = WeaponBoneName != NAME_None && WeaponAttachComponent->DoesSocketExist(WeaponBoneName);
-		WeaponAttachWorldTransform = bHasWeaponSocket
-			? WeaponAttachComponent->GetSocketTransform(WeaponBoneName, RTS_World)
-			: WeaponAttachComponent->GetComponentTransform();
+		return;
 	}
 
-	const FTransform WeaponAttachToActorTransform = WeaponAttachWorldTransform.GetRelativeTransform(WeaponActor->GetActorTransform());
-	const FTransform DesiredActorTransform = WeaponAttachToActorTransform.Inverse() * ParentAttachWorldTransform;
-
-	WeaponActor->SetActorTransform(DesiredActorTransform);
-	WeaponActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, bHasCharacterSocket ? CharacterBoneName : NAME_None);
+	AnimInstance->Montage_Play(Montage);
 }

@@ -4,9 +4,11 @@
 #include "GameFramework/Character.h"
 #include "DdBaseCharacter.generated.h"
 
+class ADdWeaponActor;
 class UCharacterTrajectoryComponent;
 class UDdCombatComponent;
 class FLifetimeProperty;
+struct FDdWeaponTableRow;
 
 UCLASS(Abstract)
 class DDPROJECT_API ADdBaseCharacter : public ACharacter
@@ -31,26 +33,27 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void SetMovementInputBlocked(bool bBlocked);
-	virtual void SetAttackInputBlocked(bool bBlocked);
+	virtual void SetAttackBlocked(bool bBlocked);
 
 	UFUNCTION(BlueprintPure, Category = "Combat")
-	bool IsAttackInputBlocked() const { return bAttackInputBlocked; }
-
-	UFUNCTION(BlueprintPure, Category = "Combat")
-	bool IsAttacking() const { return bIsAttacking; }
-
-	UFUNCTION(BlueprintPure, Category = "Combat")
-	bool CanAttack() const { return !bAttackInputBlocked && !bIsAttacking; }
+	bool IsAttackBlocked() const { return bAttackBlocked; }
 
 	UFUNCTION(BlueprintPure, Category = "Movement")
 	bool IsMovementInputBlocked() const { return bMovementInputBlocked; }
 
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	ADdWeaponActor* GetEquippedWeaponActor() const { return EquippedWeaponActor; }
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	void InitializeWeaponActor();
+	void DestroyWeaponActor();
+	void AttachWeaponActorToCharacter(const FDdWeaponTableRow& WeaponRow, ADdWeaponActor* WeaponActor) const;
+
 	void ApplyCameraCollisionIgnores();
-	void SetAttacking(bool bInIsAttacking) { bIsAttacking = bInIsAttacking; }
 	void ApplyRotationModeFromState();
 	void SetUseControllerDesiredRotationMode(bool bInUseControllerDesiredRotationMode);
 	void ApplyWalkSpeedFromState();
@@ -87,11 +90,14 @@ protected:
 	bool bUseSlowWalkSpeed = false;
 
 	UPROPERTY(Transient)
-	bool bAttackInputBlocked = false;
-
-	UPROPERTY(Transient)
-	bool bIsAttacking = false;
+	bool bAttackBlocked = false;
 
 	UPROPERTY(Transient)
 	bool bMovementInputBlocked = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
+	int32 WeaponId = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<ADdWeaponActor> EquippedWeaponActor;
 };

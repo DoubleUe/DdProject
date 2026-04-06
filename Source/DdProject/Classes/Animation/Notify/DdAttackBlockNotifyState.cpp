@@ -17,7 +17,7 @@ static void SetAttackBlockedState(USkeletalMeshComponent* MeshComp, bool bBlocke
 
 	if (ADdBaseCharacter* BaseCharacter = Cast<ADdBaseCharacter>(MeshComp->GetOwner()))
 	{
-		BaseCharacter->SetAttackInputBlocked(bBlocked);
+		BaseCharacter->SetAttackBlocked(bBlocked);
 	}
 }
 
