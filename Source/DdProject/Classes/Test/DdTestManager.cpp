@@ -12,7 +12,7 @@ ADdTestManager::ADdTestManager()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	static ConstructorHelpers::FClassFinder<ADdMonsterCharacter> ZombieBlueprintClass(TEXT("/Game/Characters/Zombie/BP_ZombieMonsterCharacter"));
+	static ConstructorHelpers::FClassFinder<ADdMonsterCharacter> ZombieBlueprintClass(TEXT("/Game/Characters/Whisper/CBP_Whisper"));
 	if (ZombieBlueprintClass.Succeeded())
 	{
 		ZombieClass = ZombieBlueprintClass.Class;

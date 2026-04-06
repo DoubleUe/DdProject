@@ -4,10 +4,6 @@
 #include "DdBaseCharacter.h"
 #include "DdMonsterCharacter.generated.h"
 
-class UAnimationAsset;
-class UBlendSpace1D;
-class USkeletalMeshComponent;
-
 UCLASS()
 class DDPROJECT_API ADdMonsterCharacter : public ADdBaseCharacter
 {
@@ -36,26 +32,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AI")
 	float GetDistanceToTarget() const { return DistanceToTarget; }
 
-protected:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	TObjectPtr<UAnimationAsset> AttackAnimation;
-
 private:
-	void LoadAnimationAssets();
-	void UpdateMovementAnimation(float DeltaSeconds);
-	void OnAttackAnimationEnded();
-	USkeletalMeshComponent* FindSkeletalMeshComponent() const;
-
-	UPROPERTY()
-	TObjectPtr<UBlendSpace1D> IdleRunBlendSpace;
-
-	bool bIsPlayingBlendSpace = false;
-	FVector PreviousAnimationLocation;
-	bool bHasPreviousAnimationLocation = false;
-
 	UPROPERTY()
 	TWeakObjectPtr<AActor> TargetActor;
 

@@ -64,13 +64,13 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerSetUseSlowWalkSpeed(bool bInUseSlowWalkSpeed);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Trajectory", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCharacterTrajectoryComponent> TrajectoryComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	float NormalWalkSpeed = 500.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	float SlowWalkSpeed = 250.0f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_UseControllerDesiredRotationMode, Transient)

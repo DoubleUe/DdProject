@@ -16,6 +16,7 @@ public:
 	FDdResourceTable();
 
 	const TArray<FDdResourceTableRow>& GetRows() const { return Rows; }
+	const FDdResourceTableRow* FindRowById(int32 Id) const;
 
 protected:
 	virtual bool DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject) override;

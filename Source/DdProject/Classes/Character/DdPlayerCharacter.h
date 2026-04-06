@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "DdBaseCharacter.h"
-#include "TimerManager.h"
 #include "DdPlayerCharacter.generated.h"
 
-class UAnimSequenceBase;
+class ADdWeaponActor;
 class UDdPlayerCameraComponent;
 struct FInputActionValue;
+struct FDdWeaponTableRow;
 
 UCLASS()
 class DDPROJECT_API ADdPlayerCharacter : public ADdBaseCharacter
@@ -22,16 +22,21 @@ public:
 	void TryAttack();
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void Destroyed() override;
 
 private:
-	void FinishAttackAnimation();
+	void InitializeWeaponActor();
+	void DestroyWeaponActor();
+	void AttachWeaponActorToCharacter(const FDdWeaponTableRow& WeaponRow, ADdWeaponActor* WeaponActor) const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDdPlayerCameraComponent> PlayerCameraComp;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAnimSequenceBase> AttackAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
+	int32 WeaponId = 0;
 
-	FTimerHandle AttackAnimationTimerHandle;
+	UPROPERTY(Transient)
+	TObjectPtr<ADdWeaponActor> EquippedWeaponActor;
 };

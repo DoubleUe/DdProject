@@ -7,6 +7,14 @@ FDdResourceTable::FDdResourceTable()
 {
 }
 
+const FDdResourceTableRow* FDdResourceTable::FindRowById(int32 Id) const
+{
+	return Rows.FindByPredicate([Id](const FDdResourceTableRow& Row)
+	{
+		return Row.Id == Id;
+	});
+}
+
 bool FDdResourceTable::DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject)
 {
 	if (!JsonObject.IsValid())

@@ -7,6 +7,14 @@ FDdWeaponTable::FDdWeaponTable()
 {
 }
 
+const FDdWeaponTableRow* FDdWeaponTable::FindRowById(int32 Id) const
+{
+	return Rows.FindByPredicate([Id](const FDdWeaponTableRow& Row)
+	{
+		return Row.Id == Id;
+	});
+}
+
 bool FDdWeaponTable::DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject)
 {
 	if (!JsonObject.IsValid())

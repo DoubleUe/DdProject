@@ -6,7 +6,6 @@
 #include "../UI/Gameplay/DdGameplayHud.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "UObject/ConstructorHelpers.h"
 
 namespace
 {
@@ -19,12 +18,6 @@ ADdGameLevelGameMode::ADdGameLevelGameMode()
 	PlayerStateClass = ADdGameplayPlayerState::StaticClass();
 	PlayerControllerClass = ADdGameplayPlayerController::StaticClass();
 	HUDClass = ADdGameplayHud::StaticClass();
-
-	static ConstructorHelpers::FClassFinder<APawn> PlayerBPClass(TEXT("/Game/Characters/Player/BP_PlayerCharacter"));
-	if (PlayerBPClass.Succeeded())
-	{
-		DefaultPawnClass = PlayerBPClass.Class;
-	}
 }
 
 void ADdGameLevelGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)

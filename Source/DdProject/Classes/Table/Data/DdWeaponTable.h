@@ -20,6 +20,7 @@ public:
 	FDdWeaponTable();
 
 	const TArray<FDdWeaponTableRow>& GetRows() const { return Rows; }
+	const FDdWeaponTableRow* FindRowById(int32 Id) const;
 
 protected:
 	virtual bool DeserializeRow(const TSharedPtr<FJsonObject>& JsonObject) override;
