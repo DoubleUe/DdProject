@@ -17,7 +17,7 @@ struct FDdWeaponTableRow
 	int32 ResourceId = 0;
 	FString WeaponBoneName;
 	FString CharacterBoneName;
-	FString ComboIds;
+	TArray<int32> ComboIds;
 	FString Desc;
 };
 

@@ -17,6 +17,7 @@ protected:
 	static FString GetOptionalStringField(const TSharedPtr<FJsonObject>& JsonObject, const TCHAR* FieldName);
 	static int32 GetOptionalIntField(const TSharedPtr<FJsonObject>& JsonObject, const TCHAR* FieldName);
 	static bool GetOptionalBoolField(const TSharedPtr<FJsonObject>& JsonObject, const TCHAR* FieldName);
+	static TArray<int32> ParseCommaDelimitedIntArray(const FString& Value);
 
 	// enum 파싱 헬퍼 — 자식 클래스에서 ValueMap을 정의하여 사용
 	template<typename TEnum>

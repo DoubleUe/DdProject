@@ -255,7 +255,7 @@ void SDdTableEditorPanel::ReloadSelectedTableRows()
 						}
 
 						const TSharedPtr<FJsonValue>* JsonValue = JsonObject->Values.Find(ColumnId.ToString());
-						RowItem->CellValues.Add(ColumnId, JsonValue != nullptr ? FormatJsonValue(*JsonValue) : FString());
+						RowItem->CellValues.Add(ColumnId, JsonValue != nullptr ? FormatJsonValue(*JsonValue, ColumnId) : FString());
 					}
 
 					TableRowItems.Add(RowItem);
@@ -378,7 +378,7 @@ FString SDdTableEditorPanel::GetSelectedTablePath() const
 	return FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Json"), TEXT("Table"), *SelectedTableOption);
 }
 
-FString SDdTableEditorPanel::FormatJsonValue(const TSharedPtr<FJsonValue>& JsonValue) const
+FString SDdTableEditorPanel::FormatJsonValue(const TSharedPtr<FJsonValue>& JsonValue, const FName& ColumnId) const
 {
 	if (!JsonValue.IsValid())
 	{
@@ -391,7 +391,21 @@ FString SDdTableEditorPanel::FormatJsonValue(const TSharedPtr<FJsonValue>& JsonV
 	case EJson::Null:
 		return TEXT("null");
 	case EJson::String:
-		return JsonValue->AsString();
+	{
+		const FString StringValue = JsonValue->AsString();
+		// 쉼표 구분 배열 문자열을 [1, 2, 3] 형태로 표시
+		if (StringValue.Contains(TEXT(",")) && ColumnId != NAME_None)
+		{
+			TArray<FString> Tokens;
+			StringValue.ParseIntoArray(Tokens, TEXT(","));
+			for (FString& Token : Tokens)
+			{
+				Token = Token.TrimStartAndEnd();
+			}
+			return FString::Printf(TEXT("[%s]"), *FString::Join(Tokens, TEXT(", ")));
+		}
+		return StringValue;
+	}
 	case EJson::Number:
 		return JsonValue->AsString();
 	case EJson::Boolean:

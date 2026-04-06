@@ -5,7 +5,7 @@
         "ResourceID":  1,
         "WeaponBoneName":  "hand",
         "CharacterBoneName":  "hand_r_weapon",
-        "ComboIDs":  null,
+        "ComboIDs":  1,
         "Desc":  "Player desc"
     },
     {

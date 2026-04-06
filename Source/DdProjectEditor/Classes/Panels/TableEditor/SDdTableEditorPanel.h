@@ -37,7 +37,7 @@ private:
 	FString GetTableDirectoryPath() const;
 	FString GetTableSearchPattern() const;
 	FString GetSelectedTablePath() const;
-	FString FormatJsonValue(const TSharedPtr<class FJsonValue>& JsonValue) const;
+	FString FormatJsonValue(const TSharedPtr<class FJsonValue>& JsonValue, const FName& ColumnId = NAME_None) const;
 	FText GetColumnDisplayText(const FName& ColumnId) const;
 
 	TArray<TSharedPtr<FString>> TableOptions;

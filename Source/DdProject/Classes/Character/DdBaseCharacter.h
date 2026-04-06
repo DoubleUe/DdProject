@@ -5,6 +5,7 @@
 #include "DdBaseCharacter.generated.h"
 
 class UCharacterTrajectoryComponent;
+class UDdCombatComponent;
 class FLifetimeProperty;
 
 UCLASS(Abstract)
@@ -17,6 +18,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Trajectory")
 	UCharacterTrajectoryComponent* GetTrajectoryComponent() const;
+
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	UDdCombatComponent* GetCombatComponent() const { return CombatComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "Movement|Rotation")
 	void ToggleRotationMode();
@@ -66,6 +70,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCharacterTrajectoryComponent> TrajectoryComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDdCombatComponent> CombatComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DDP", meta = (AllowPrivateAccess = "true"))
 	float NormalWalkSpeed = 500.0f;

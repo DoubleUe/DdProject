@@ -1,6 +1,7 @@
 #include "DdBaseCharacter.h"
 
 #include "CharacterTrajectoryComponent.h"
+#include "Components/DdCombatComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -10,6 +11,7 @@ ADdBaseCharacter::ADdBaseCharacter()
 	bReplicates = true;
 
 	TrajectoryComponent = CreateDefaultSubobject<UCharacterTrajectoryComponent>(TEXT("TrajectoryComponent"));
+	CombatComponent = CreateDefaultSubobject<UDdCombatComponent>(TEXT("CombatComponent"));
 
 	ApplyCameraCollisionIgnores();
 	ApplyRotationModeFromState();

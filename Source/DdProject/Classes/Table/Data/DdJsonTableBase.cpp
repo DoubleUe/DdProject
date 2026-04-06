@@ -30,6 +30,23 @@ bool FDdJsonTableBase::GetOptionalBoolField(const TSharedPtr<FJsonObject>& JsonO
 	return Value.Equals(TEXT("TRUE"), ESearchCase::IgnoreCase);
 }
 
+TArray<int32> FDdJsonTableBase::ParseCommaDelimitedIntArray(const FString& Value)
+{
+	TArray<int32> Result;
+	if (Value.IsEmpty())
+	{
+		return Result;
+	}
+
+	TArray<FString> Tokens;
+	Value.ParseIntoArray(Tokens, TEXT(","));
+	for (const FString& Token : Tokens)
+	{
+		Result.Add(FCString::Atoi(*Token.TrimStartAndEnd()));
+	}
+	return Result;
+}
+
 bool FDdJsonTableBase::Load()
 {
 	ResetRows();
