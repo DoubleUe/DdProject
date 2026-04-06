@@ -50,6 +50,7 @@ Build/*/**
 *.a
 *.lib
 *.exe
+!Excel/Tools/ExportExcelTablesToJson.exe
 *.out
 *.app
 *.ipa

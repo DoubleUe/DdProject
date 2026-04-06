@@ -1,0 +1,18 @@
+[
+    {
+        "id":  1,
+        "Type":  "Melee",
+        "ResourceID":  null,
+        "BoneName":  null,
+        "ComboIDs":  null,
+        "Desc":  "Player desc"
+    },
+    {
+        "id":  2,
+        "Type":  "Ranged",
+        "ResourceID":  null,
+        "BoneName":  null,
+        "ComboIDs":  null,
+        "Desc":  "Monster desc"
+    }
+]

@@ -1,0 +1,17 @@
+[
+    {
+        "id":  1,
+        "Type":  "Player",
+        "Desc":  "Player desc"
+    },
+    {
+        "id":  2,
+        "Type":  "Monster",
+        "Desc":  "Monster desc"
+    },
+    {
+        "id":  3,
+        "Type":  "NPC",
+        "Desc":  "test desc"
+    }
+]
