@@ -3,5 +3,11 @@
     "eType":  "NormalAttack",
     "Combo_ResourceID_1":  2,
     "bCombo_Blend_1":  "TRUE",
+    "Combo_ResourceID_2":  3,
+    "bCombo_Blend_2":  "FALSE",
+    "Combo_ResourceID_3":  4,
+    "bCombo_Blend_3":  "TRUE",
+    "Combo_ResourceID_4":  5,
+    "bCombo_Blend_4":  "FALSE",
     "Desc":  "플레이어 기본 평타"
 }

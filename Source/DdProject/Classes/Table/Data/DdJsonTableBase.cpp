@@ -1,6 +1,7 @@
 #include "Table/Data/DdJsonTableBase.h"
 
 #include "Dom/JsonObject.h"
+#include "Dom/JsonValue.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Serialization/JsonReader.h"
@@ -45,8 +46,18 @@ bool FDdJsonTableBase::Load()
 	const TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonText);
 	if (!FJsonSerializer::Deserialize(JsonReader, JsonValues))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to parse table json file: %s"), *TableFilePath);
-		return false;
+		// 배열 파싱 실패 시 단일 객체로 재시도
+		TSharedPtr<FJsonObject> SingleObject;
+		const TSharedRef<TJsonReader<>> RetryReader = TJsonReaderFactory<>::Create(JsonText);
+		if (FJsonSerializer::Deserialize(RetryReader, SingleObject) && SingleObject.IsValid())
+		{
+			JsonValues.Add(MakeShared<FJsonValueObject>(SingleObject));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to parse table json file: %s"), *TableFilePath);
+			return false;
+		}
 	}
 
 	for (int32 Index = 0; Index < JsonValues.Num(); ++Index)

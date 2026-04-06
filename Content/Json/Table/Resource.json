@@ -6,6 +6,26 @@
     },
     {
         "id":  2,
+        "Path":  "/Script/Engine.AnimMontage\u0027/Game/Characters/Lyra/Animation/Assets/Combat/PrimaryAttack_A_Slow_Montage.PrimaryAttack_A_Slow_Montage\u0027",
+        "Desc":  null
+    },
+    {
+        "id":  3,
+        "Path":  "/Script/Engine.AnimMontage\u0027/Game/Characters/Lyra/Animation/Assets/Combat/PrimaryAttack_B_Slow_Montage.PrimaryAttack_B_Slow_Montage\u0027",
+        "Desc":  null
+    },
+    {
+        "id":  4,
+        "Path":  "/Script/Engine.AnimMontage\u0027/Game/Characters/Lyra/Animation/Assets/Combat/PrimaryAttack_C_Slow_Montage.PrimaryAttack_C_Slow_Montage\u0027",
+        "Desc":  null
+    },
+    {
+        "id":  5,
+        "Path":  "/Script/Engine.AnimMontage\u0027/Game/Characters/Lyra/Animation/Assets/Combat/PrimaryAttack_D_Slow_Montage.PrimaryAttack_D_Slow_Montage\u0027",
+        "Desc":  null
+    },
+    {
+        "id":  6,
         "Path":  null,
         "Desc":  null
     }

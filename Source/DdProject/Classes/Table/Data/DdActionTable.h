@@ -15,6 +15,12 @@ struct FDdActionTableRow
 	EDdActionType Type = EDdActionType::None;
 	int32 ComboResourceId1 = 0;
 	bool bComboBlend1 = false;
+	int32 ComboResourceId2 = 0;
+	bool bComboBlend2 = false;
+	int32 ComboResourceId3 = 0;
+	bool bComboBlend3 = false;
+	int32 ComboResourceId4 = 0;
+	bool bComboBlend4 = false;
 	FString Desc;
 };
 
