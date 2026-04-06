@@ -44,6 +44,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	ADdWeaponActor* GetEquippedWeaponActor() const { return EquippedWeaponActor; }
 
+	// 모든 클라이언트에서 몽타주 재생
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayMontage(UAnimMontage* Montage);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;

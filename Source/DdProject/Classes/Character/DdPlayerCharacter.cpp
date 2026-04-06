@@ -89,6 +89,25 @@ void ADdPlayerCharacter::ApplyLookInput(const FInputActionValue& Value)
 
 void ADdPlayerCharacter::TryAttack()
 {
+	if (IsAttackBlocked())
+	{
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		// 호스트: 서버에서 직접 실행
+		ServerTryAttack_Implementation();
+	}
+	else
+	{
+		// 클라이언트: 서버에 공격 요청
+		ServerTryAttack();
+	}
+}
+
+void ADdPlayerCharacter::ServerTryAttack_Implementation()
+{
 	if (IsAttackBlocked() || CombatComponent == nullptr)
 	{
 		return;
@@ -106,11 +125,5 @@ void ADdPlayerCharacter::TryAttack()
 		return;
 	}
 
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance == nullptr)
-	{
-		return;
-	}
-
-	AnimInstance->Montage_Play(Montage);
+	MulticastPlayMontage(Montage);
 }

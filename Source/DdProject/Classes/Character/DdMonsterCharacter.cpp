@@ -1,6 +1,7 @@
 #include "DdMonsterCharacter.h"
 
 #include "AIController.h"
+#include "Components/DdCombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -46,6 +47,24 @@ void ADdMonsterCharacter::SetMovementInputBlocked(bool bBlocked)
 
 bool ADdMonsterCharacter::PlayAttackAnimation()
 {
-	return false;
+	if (IsAttackBlocked() || CombatComponent == nullptr)
+	{
+		return false;
+	}
+
+	const TArray<FDdComboSet>& ComboSets = CombatComponent->GetComboSets();
+	if (ComboSets.Num() == 0 || ComboSets[0].Steps.Num() == 0)
+	{
+		return false;
+	}
+
+	UAnimMontage* Montage = ComboSets[0].Steps[0].Montage;
+	if (Montage == nullptr)
+	{
+		return false;
+	}
+
+	MulticastPlayMontage(Montage);
+	return true;
 }
 

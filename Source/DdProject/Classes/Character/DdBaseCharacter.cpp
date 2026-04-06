@@ -166,6 +166,22 @@ void ADdBaseCharacter::ServerSetUseSlowWalkSpeed_Implementation(bool bInUseSlowW
 	SetUseSlowWalkSpeed(bInUseSlowWalkSpeed);
 }
 
+void ADdBaseCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage)
+{
+	if (Montage == nullptr)
+	{
+		return;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance == nullptr)
+	{
+		return;
+	}
+
+	AnimInstance->Montage_Play(Montage);
+}
+
 void ADdBaseCharacter::InitializeWeaponActor()
 {
 	DestroyWeaponActor();

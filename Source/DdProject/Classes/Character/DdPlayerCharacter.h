@@ -20,6 +20,11 @@ public:
 	void TryAttack();
 
 protected:
+	// 클라이언트 → 서버 공격 요청
+	UFUNCTION(Server, Reliable)
+	void ServerTryAttack();
+
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
